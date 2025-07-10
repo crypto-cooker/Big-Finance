@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import WalletConnectBtn from "../components/WalletConnect";
 
 const TOKENS = [
   { 
@@ -69,13 +70,7 @@ export default function LaunchApp() {
               <Link href="/transparency" className="text-emerald-100 hover:text-emerald-300 transition-colors">
                 Transparency
               </Link>
-              <button 
-                onClick={handleConnect}
-                disabled={isConnecting}
-                className="bg-gradient-to-r from-emerald-400 to-cyan-400 text-slate-900 px-6 py-2 rounded-lg font-semibold hover:from-emerald-300 hover:to-cyan-300 transition-all duration-200 shadow-lg disabled:opacity-50"
-              >
-                {isConnecting ? 'Connecting...' : 'Connect Wallet'}
-              </button>
+              <WalletConnectBtn/>
             </div>
           </div>
         </div>

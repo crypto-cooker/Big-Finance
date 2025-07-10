@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 
+
 const TOKENS = [
   { 
     symbol: 'USDC', 
@@ -48,12 +49,6 @@ const SOLUTIONS = [
   { title: 'Competitive TradFi', icon: '⚡' },
   { title: 'Spark Growth', icon: '🚀' },
   { title: 'Better Yields', icon: '📈' },
-];
-
-const SOCIAL_LINKS = [
-  { name: 'Discord', icon: '💬', url: '#' },
-  { name: 'Twitter', icon: '🐦', url: '#' },
-  { name: 'Gitbook', icon: '📚', url: '#' },
 ];
 
 export default function Home() {

@@ -1,87 +1,106 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import "animate.css";
 
-interface WalletConnectProps {
-  onConnect: (wallet: string) => void
-  isConnected: boolean
-  onDisconnect: () => void
-}
-
-const WALLETS = [
-  { id: 'metamask', name: 'MetaMask', icon: '🦊', description: 'Connect with MetaMask' },
-  { id: 'phantom', name: 'Phantom', icon: '👻', description: 'Connect with Phantom' },
-  { id: 'walletconnect', name: 'WalletConnect', icon: '🔗', description: 'Connect with WalletConnect' },
-  { id: 'coinbase', name: 'Coinbase Wallet', icon: '🪙', description: 'Connect with Coinbase Wallet' },
-]
-
-export default function WalletConnect({ onConnect, isConnected, onDisconnect }: WalletConnectProps) {
-  const [showModal, setShowModal] = useState(false)
-
-  const handleWalletSelect = (walletId: string) => {
-    onConnect(walletId)
-    setShowModal(false)
-  }
-
-  if (isConnected) {
-    return (
-      <button 
-        onClick={onDisconnect}
-        className="bg-green-500 text-white px-4 py-2 rounded-md font-medium hover:bg-green-600 transition"
-      >
-        Connected
-      </button>
-    )
-  }
-
+const WalletConnectBtn = () => {
   return (
-    <>
-      <button 
-        onClick={() => setShowModal(true)}
-        className="bg-primary text-white px-4 py-2 rounded-md font-medium hover:bg-primary/90 transition"
-      >
-        Connect Wallet
-      </button>
+    <div className="flex items-center justify-center flex-col gap-[32px] animate__animated animate__fadeIn">
+      <ConnectButton.Custom>
+        {({
+          account,
+          chain,
+          openAccountModal,
+          openChainModal,
+          openConnectModal,
+          authenticationStatus,
+          mounted,
+        }) => {
+          const ready = mounted && authenticationStatus !== "loading";
+          const connected =
+            ready &&
+            account &&
+            chain &&
+            (!authenticationStatus || authenticationStatus === "authenticated");
 
-      {/* Wallet Selection Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Connect Wallet</h3>
-              <button 
-                onClick={() => setShowModal(false)}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="space-y-3">
-              {WALLETS.map(wallet => (
-                <button
-                  key={wallet.id}
-                  onClick={() => handleWalletSelect(wallet.id)}
-                  className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-                >
-                  <span className="text-2xl">{wallet.icon}</span>
-                  <div className="text-left">
-                    <div className="font-medium">{wallet.name}</div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">{wallet.description}</div>
+          return (
+            <div
+              {...(!ready && {
+                "aria-hidden": true,
+                style: {
+                  opacity: 0,
+                  pointerEvents: "none",
+                  userSelect: "none",
+                },
+              })}
+            >
+              {(() => {
+                if (!connected) {
+                  return (
+                    <button
+                      onClick={openConnectModal}
+                      type="button"
+                      className="text-white text-md font-bold uppercase bg-gradient-to-r from-[#667EEA] to-[#764BA2] px-3 py-2
+                       rounded-md border-b-[3px] border-t-[1px] border-black border-opacity-30"
+                    >
+                      <p
+                        style={{
+                          textShadow: "0 1px 0px rgba(0, 25, 66, 0.4)",
+                        }}
+                      >
+                        Connect Wallet
+                      </p>
+                    </button>
+                  );
+                }
+
+                if (chain.unsupported) {
+                  return (
+                    <button onClick={openChainModal} type="button">
+                      Wrong network
+                    </button>
+                  );
+                }
+
+                return (
+                  <div className="flex items-center gap-[20px]">
+                    <button
+                      onClick={openChainModal}
+                      type="button"
+                      className="text-white text-[18px] font-bold uppercase bg-gradient-to-r from-[#667EEA] to-[#764BA2] px-3 py-2
+                      rounded-md border-b-[3px] border-t-[1px] border-black border-opacity-30"
+                    >
+                      {chain.hasIcon && (
+                        <div className="">
+                          {chain.iconUrl && (
+                            <img
+                              alt={chain.name ?? "Chain icon"}
+                              src={chain.iconUrl}
+                              style={{ width: 20, height: 20 }}
+                            />
+                          )}
+                        </div>
+                      )}
+                    </button>
+
+                    <button
+                      onClick={openAccountModal}
+                      type="button"
+                      className="text-white text-[18px] font-bold uppercase bg-gradient-to-r from-[#667EEA] to-[#764BA2] px-[24px] py-[5px] rounded-md border-b-[3px] border-t-[1px] border-black border-opacity-30"
+                    >
+                      {account.displayName.slice(0, 4) +
+                        "..." +
+                        account.displayName.slice(-4)}
+                    </button>
                   </div>
-                </button>
-              ))}
+                );
+              })()}
             </div>
-            <div className="mt-4 text-center">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Don't have a wallet?{' '}
-                <a href="https://metamask.io" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                  Get one here
-                </a>
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  )
-} 
+          );
+        }}
+      </ConnectButton.Custom>
+    </div>
+  );
+};
+
+export default WalletConnectBtn;
