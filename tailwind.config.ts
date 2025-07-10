@@ -9,22 +9,26 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Custom colors for Stream Protocol
-        'stream-blue': '#3B82F6',
-        'stream-purple': '#8B5CF6',
-        'stream-indigo': '#6366F1',
+        // Main dark background and blue/teal accent colors
+        'bigfi-bg': '#10141C', // main dark background
+        'bigfi-panel': '#181E29', // panel/card background
+        'bigfi-border': '#232B3A', // border color
+        'bigfi-blue': '#1CA7EC', // blue gradient left
+        'bigfi-teal': '#23D18B', // blue-green gradient right
+        'bigfi-btn': '#2176AE', // button blue
+        'bigfi-btn-dark': '#174A6A', // button blue dark
+        'bigfi-gray': '#A3B1C6', // muted text
+        'bigfi-accent': '#00CFFF', // accent cyan
       },
-      animation: {
-        'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
-        'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-      },
-      backdropBlur: {
-        xs: '2px',
+      backgroundImage: {
+        'bigfi-gradient': 'linear-gradient(90deg, #1CA7EC 0%, #23D18B 100%)',
+        'bigfi-panel-gradient': 'linear-gradient(180deg, #181E29 60%, #10141C 100%)',
       },
       boxShadow: {
-        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        'medium': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-        'large': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        'bigfi': '0 2px 16px 0 rgba(28,167,236,0.10)',
+      },
+      borderRadius: {
+        'bigfi': '12px',
       },
     },
   },

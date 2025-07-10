@@ -15,7 +15,11 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #000000;
+  /* Animated gradient background for BIG FI */
+  background: #10141C;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
   color: #ffffff;
   margin: 0;
   padding: 0;
@@ -131,4 +135,38 @@ textarea:focus {
   .text-4xl {
     font-size: 1.75rem;
   }
+}
+
+/* Animated floating whale shapes (CSS only, for demo) */
+.bigfi-bg-anim {
+  position: fixed;
+  z-index: 0;
+  pointer-events: none;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  overflow: hidden;
+}
+
+.bigfi-blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.18;
+  filter: blur(32px);
+  animation: bigfi-blob-float 16s ease-in-out infinite alternate;
+}
+
+.bigfi-blob1 { left: 5vw; top: 10vh; width: 400px; height: 400px; background: linear-gradient(120deg, #1CA7EC 60%, #23D18B 100%); animation-delay: 0s; }
+.bigfi-blob2 { right: 8vw; top: 60vh; width: 320px; height: 320px; background: linear-gradient(120deg, #23D18B 60%, #1CA7EC 100%); animation-delay: 4s; }
+.bigfi-blob3 { left: 40vw; top: 30vh; width: 300px; height: 300px; background: linear-gradient(120deg, #2176AE 60%, #00CFFF 100%); animation-delay: 8s; }
+
+@keyframes bigfi-blob-float {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-40px) scale(1.08); }
+}
+
+.bigfi-panel-solid {
+  background: rgba(24, 30, 41, 0.96); /* nearly solid, but not pure black */
+  border-radius: 16px;
+  box-shadow: 0 4px 32px 0 rgba(28,167,236,0.10);
+  border: 1px solid #232B3A;
+  backdrop-filter: blur(2px);
 }

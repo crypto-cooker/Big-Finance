@@ -40,34 +40,35 @@ const TOKENS = [
 export default function LaunchApp() {
   const [selectedToken, setSelectedToken] = useState(TOKENS[0])
   const [amount, setAmount] = useState('')
-  const [isConnecting, setIsConnecting] = useState(false)
+  const [withdrawAmount, setWithdrawAmount] = useState('')
+  const [tab, setTab] = useState<'stake' | 'withdraw'>('stake')
 
-  const handleConnect = () => {
-    setIsConnecting(true)
-    setTimeout(() => {
-      setIsConnecting(false)
-    }, 2000)
-  }
+  // Example values for info rows (replace with real data as needed)
+  const availableToDeposit = 0
+  const availableToWithdraw = 0
+  const vaultToken = 'xUSD'
+  const capNote = 'The maximum amount you can deposit before reaching the cap.'
+  const withdrawRate = 0.825 // 1 USDC ≈ 0.825 xUSD
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
+    <div className="min-h-screen text-white">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-emerald-500/20">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-md border-b border-bigfi-blue/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-emerald-900 to-cyan-900 rounded-xl flex items-center justify-center text-slate-900 font-bold text-xl">
+              <div className="w-10 h-10 flex items-center justify-center text-slate-900 font-bold text-xl">
                 <img src="/logo.png" alt="" />
               </div>
-              <a href='/' className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent cursor-pointer">
-                Big FI
+              <a href='/' className="text-2xl font-bold bg-gradient-to-r from-bigfi-blue to-bigfi-teal bg-clip-text text-transparent cursor-pointer">
+                BIG FI
               </a>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/how-it-works" className="text-emerald-100 hover:text-emerald-300 transition-colors">
+              <Link href="/how-it-works" className="text-bigfi-blue hover:text-bigfi-green transition-colors">
                 How it works
               </Link>
-              <Link href="/transparency" className="text-emerald-100 hover:text-emerald-300 transition-colors">
+              <Link href="/transparency" className="text-bigfi-blue hover:text-bigfi-green transition-colors">
                 Transparency
               </Link>
               <WalletConnectBtn/>
@@ -80,34 +81,33 @@ export default function LaunchApp() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="text-center mb-12 pt-8">
-            <div className="inline-flex items-center gap-2 bg-emerald-500/20 backdrop-blur-sm rounded-full px-6 py-3 mb-8 border border-emerald-500/30">
-              <span className="text-sm font-medium text-emerald-100">DeFi Yield Platform</span>
-              <span className="text-emerald-400">🚀</span>
+            <div className="inline-flex items-center gap-2 bg-bigfi-blue/20 backdrop-blur-sm rounded-full px-6 py-3 mb-8 border border-bigfi-blue/30">
+              <span className="text-sm font-medium text-bigfi-gray">DeFi Yield Platform</span>
+              <span className="text-bigfi-accent">🚀</span>
             </div>
-            
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-emerald-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-bigfi-blue via-bigfi-btn to-bigfi-teal bg-clip-text text-transparent">
               Big Fi Protocol
             </h1>
-            <p className="text-xl text-emerald-100">The SuperApp DeFi Deserves</p>
+            <p className="text-xl text-bigfi-gray">The SuperApp DeFi Deserves</p>
           </div>
 
           {/* TVL Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-emerald-500/20 hover:border-emerald-400/40 transition-all duration-300">
-              <div className="text-sm text-emerald-300 mb-2">Total Value Locked</div>
-              <div className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">$83.97M</div>
+            <div className="bg-bigfi-panel/80 backdrop-blur-sm rounded-bigfi p-6 border border-bigfi-border hover:border-bigfi-blue/40 transition-all duration-300">
+              <div className="text-sm text-bigfi-gray mb-2">Total Value Locked</div>
+              <div className="text-2xl font-bold bg-gradient-to-r from-bigfi-blue to-bigfi-teal bg-clip-text text-transparent">$83.97M</div>
             </div>
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-emerald-500/20 hover:border-emerald-400/40 transition-all duration-300">
-              <div className="text-sm text-emerald-300 mb-2">Total Users</div>
-              <div className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">1,247</div>
+            <div className="bg-bigfi-panel/80 backdrop-blur-sm rounded-bigfi p-6 border border-bigfi-border hover:border-bigfi-blue/40 transition-all duration-300">
+              <div className="text-sm text-bigfi-gray mb-2">Total Users</div>
+              <div className="text-2xl font-bold bg-gradient-to-r from-bigfi-blue to-bigfi-teal bg-clip-text text-transparent">1,247</div>
             </div>
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-emerald-500/20 hover:border-emerald-400/40 transition-all duration-300">
-              <div className="text-sm text-emerald-300 mb-2">Total Rewards</div>
-              <div className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">$2.1M</div>
+            <div className="bg-bigfi-panel/80 backdrop-blur-sm rounded-bigfi p-6 border border-bigfi-border hover:border-bigfi-blue/40 transition-all duration-300">
+              <div className="text-sm text-bigfi-gray mb-2">Total Rewards</div>
+              <div className="text-2xl font-bold bg-gradient-to-r from-bigfi-blue to-bigfi-teal bg-clip-text text-transparent">$2.1M</div>
             </div>
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-emerald-500/20 hover:border-emerald-400/40 transition-all duration-300">
-              <div className="text-sm text-emerald-300 mb-2">Average APY</div>
-              <div className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">13.0%</div>
+            <div className="bg-bigfi-panel/80 backdrop-blur-sm rounded-bigfi p-6 border border-bigfi-border hover:border-bigfi-blue/40 transition-all duration-300">
+              <div className="text-sm text-bigfi-gray mb-2">Average APY</div>
+              <div className="text-2xl font-bold bg-gradient-to-r from-bigfi-blue to-bigfi-teal bg-clip-text text-transparent">13.0%</div>
             </div>
           </div>
 
@@ -115,17 +115,17 @@ export default function LaunchApp() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Token Selection */}
             <div className="lg:col-span-1">
-              <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-6 border border-emerald-500/20">
-                <h2 className="text-xl font-bold mb-6 text-emerald-100">Select Vault</h2>
+              <div className="bg-bigfi-panel/80 backdrop-blur-sm rounded-bigfi p-6 border border-bigfi-border">
+                <h2 className="text-xl font-bold mb-6 text-bigfi-blue">Select Vault</h2>
                 <div className="space-y-4">
                   {TOKENS.map((token) => (
                     <button
                       key={token.symbol}
                       onClick={() => setSelectedToken(token)}
-                      className={`w-full p-4 rounded-xl border transition-all duration-200 text-left hover:scale-105 ${
+                      className={`w-full p-4 rounded-bigfi border transition-all duration-200 text-left hover:scale-105 ${
                         selectedToken.symbol === token.symbol
-                          ? 'border-emerald-400/50 bg-emerald-500/10 shadow-lg shadow-emerald-500/20'
-                          : 'border-emerald-500/20 hover:border-emerald-400/40 bg-slate-700/30'
+                          ? 'border-bigfi-teal bg-bigfi-teal/10 shadow-lg shadow-bigfi-teal/20'
+                          : 'border-bigfi-blue/20 hover:border-bigfi-teal/40 bg-bigfi-panel/60'
                       }`}
                     >
                       <div className="flex items-center gap-3 mb-2">
@@ -135,12 +135,12 @@ export default function LaunchApp() {
                           className="w-8 h-8 rounded-full transition-transform duration-200 hover:scale-110"
                         />
                         <div>
-                          <div className="font-bold text-emerald-100">{token.symbol}</div>
-                          <div className="text-sm text-emerald-300">{token.name}</div>
+                          <div className="font-bold text-bigfi-blue">{token.symbol}</div>
+                          <div className="text-sm text-bigfi-teal">{token.name}</div>
                         </div>
                       </div>
-                      <div className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">{token.apy}% APY*</div>
-                      <div className="text-sm text-emerald-300">
+                      <div className="text-2xl font-bold bg-gradient-to-r from-bigfi-blue to-bigfi-teal bg-clip-text text-transparent">{token.apy}% APY*</div>
+                      <div className="text-sm text-bigfi-teal">
                         Locked: {token.locked.toLocaleString()} {token.symbol}
                       </div>
                     </button>
@@ -149,74 +149,76 @@ export default function LaunchApp() {
               </div>
             </div>
 
-            {/* Staking Interface */}
+            {/* Staking/Withdraw Interface */}
             <div className="lg:col-span-2">
-              <div className="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-emerald-500/20">
-                <div className="flex items-center gap-4 mb-8">
-                  <img 
-                    src={selectedToken.avatar} 
-                    alt={selectedToken.name}
-                    className="w-12 h-12 rounded-full"
-                  />
-                 
-                  <div>
-                    <h2 className="text-2xl font-bold text-emerald-100">{selectedToken.symbol} Vault</h2>
-                    <div className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">{selectedToken.apy}% APY*</div>
-                  </div>
+              <div className="rounded-bigfi border border-bigfi-border bg-bigfi-panel/80 backdrop-blur-sm rounded-bigfi p-6 md:p-8 relative overflow-hidden">
+                {/* Tabs */}
+                <div className="flex border-b border-bigfi-border mb-6">
+                  <button
+                    className={`flex-1 py-3 text-lg font-semibold transition-all duration-200 ${tab === 'stake' ? 'text-bigfi-blue border-b-2 border-bigfi-blue bg-gradient-to-r from-bigfi-blue/10 to-bigfi-teal/10' : 'text-bigfi-gray'}`}
+                    onClick={() => setTab('stake')}
+                  >
+                    Deposit
+                  </button>
+                  <button
+                    className={`flex-1 py-3 text-lg font-semibold transition-all duration-200 ${tab === 'withdraw' ? 'text-bigfi-blue border-b-2 border-bigfi-blue bg-gradient-to-r from-bigfi-blue/10 to-bigfi-teal/10' : 'text-bigfi-gray'}`}
+                    onClick={() => setTab('withdraw')}
+                  >
+                    Withdraw
+                  </button>
                 </div>
 
-                <div className="mb-8">
-                  <p className="text-emerald-200 mb-6">{selectedToken.description}</p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                    <div className="bg-slate-700/50 rounded-xl p-4 border border-emerald-500/20">
-                      <div className="text-emerald-300 text-sm mb-2">Return</div>
-                      <div className="font-semibold text-emerald-100">{selectedToken.returnType}</div>
-                    </div>
-                    <div className="bg-slate-700/50 rounded-xl p-4 border border-emerald-500/20">
-                      <div className="text-emerald-300 text-sm mb-2">Risks</div>
-                      <div className="font-semibold text-emerald-100">{selectedToken.risks}</div>
-                    </div>
-                    <div className="bg-slate-700/50 rounded-xl p-4 border border-emerald-500/20">
-                      <div className="text-emerald-300 text-sm mb-2">Locked Value</div>
-                      <div className="font-semibold text-emerald-100">{selectedToken.locked.toLocaleString()} {selectedToken.symbol}</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Staking Form */}
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-emerald-200 mb-2">
-                      Amount to Stake
-                    </label>
-                    <div className="relative">
+                {/* Form */}
+                {tab === 'stake' ? (
+                  <>
+                    <div className="mb-4 text-bigfi-gray font-medium">You will deposit:</div>
+                    <div className="rounded-bigfi border border-bigfi-border flex items-center px-4 py-3 mb-4">
                       <input
                         type="number"
                         value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
+                        onChange={e => setAmount(e.target.value)}
                         placeholder="0.00"
-                        className="w-full bg-slate-700/50 border border-emerald-500/30 rounded-xl px-4 py-3 text-emerald-100 placeholder-emerald-400/50 focus:outline-none focus:border-emerald-400/70 focus:ring-2 focus:ring-emerald-400/20 transition-all duration-200"
+                        className="flex-1 bg-transparent outline-none text-lg text-white placeholder-bigfi-gray"
                       />
-                      <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-emerald-300 font-semibold">
+                      <button className="mx-2 text-bigfi-accent font-bold text-sm">MAX</button>
+                      <span className="flex items-center gap-1 text-bigfi-gray font-semibold">
+                        <img src={selectedToken.avatar} alt="" className="w-6 h-6 inline-block rounded-full mr-1" />
                         {selectedToken.symbol}
-                      </div>
+                      </span>
                     </div>
-                  </div>
-
-                  <div className="flex gap-4">
-                    <button className="flex-1 bg-slate-700/50 border border-emerald-500/30 text-emerald-100 py-3 px-4 rounded-xl hover:bg-emerald-500/10 hover:border-emerald-400/50 transition-all duration-200 font-semibold">
-                      Max
+                    <div className="mb-1 text-bigfi-gray text-sm">Available to deposit: <span className="text-white font-medium">{availableToDeposit} {selectedToken.symbol}</span></div>
+                    <div className="mb-1 text-xs text-bigfi-gray">{capNote}</div>
+                    <div className="mb-2 text-sm text-bigfi-gray">The vault token for this strategy is <span className="text-bigfi-accent font-semibold cursor-pointer">{vaultToken}</span></div>
+                    <button className="w-full mt-4 bg-bigfi-btn hover:bg-bigfi-btn-dark text-white text-lg font-semibold py-3 rounded-bigfi transition-all duration-200 disabled:opacity-60" disabled>
+                      Deposit
                     </button>
-                    <button className="flex-1 bg-gradient-to-r from-emerald-400 to-cyan-400 text-slate-900 py-3 px-4 rounded-xl font-semibold hover:from-emerald-300 hover:to-cyan-300 transition-all duration-200 shadow-lg hover:scale-105">
-                      Stake {selectedToken.symbol}
+                  </>
+                ) : (
+                  <>
+                    <div className="mb-4 text-bigfi-gray font-medium">You will initiate withdraw:</div>
+                    <div className="rounded-bigfi border border-bigfi-border flex items-center px-4 py-3 mb-4">
+                      <input
+                        type="number"
+                        value={withdrawAmount}
+                        onChange={e => setWithdrawAmount(e.target.value)}
+                        placeholder="0.00"
+                        className="flex-1 bg-transparent outline-none text-lg text-white placeholder-bigfi-gray"
+                      />
+                      <button className="mx-2 text-bigfi-accent font-bold text-sm">MAX</button>
+                      <span className="flex items-center gap-1 text-bigfi-gray font-semibold">
+                        <img src={selectedToken.avatar} alt="" className="w-6 h-6 inline-block mr-1" />
+                        {selectedToken.symbol}
+                      </span>
+                    </div>
+                    <div className="mb-1 text-xs text-bigfi-gray">1 {selectedToken.symbol} ≈ {withdrawRate} {vaultToken}</div>
+                    <div className="mb-1 text-bigfi-gray text-sm">Available balance: <span className="text-white font-medium">{availableToWithdraw}.{selectedToken.symbol}</span></div>
+                    <div className="mb-2 text-sm text-bigfi-gray">The vault token for this strategy is <span className="text-bigfi-accent font-semibold cursor-pointer">{vaultToken}</span></div>
+                    <button className="w-full mt-4 bg-bigfi-btn hover:bg-bigfi-btn-dark text-white text-lg font-semibold py-3 rounded-bigfi transition-all duration-200 disabled:opacity-60" disabled>
+                      Queue Withdraw
                     </button>
-                  </div>
-
-                  <div className="text-center text-sm text-emerald-300 bg-emerald-500/10 rounded-lg p-3 border border-emerald-500/20">
-                    *APY rates are variable and subject to change based on market conditions
-                  </div>
-                </div>
+                    <div className="mt-3 text-xs text-bigfi-gray">Once you queue the withdrawal, you will have to wait until approximately one day to complete it and get your funds.</div>
+                  </>
+                )}
               </div>
             </div>
           </div>

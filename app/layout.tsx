@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './components/Providers'
+import VantaBackground from './components/VantaBackground'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -30,10 +31,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico" />
+      </head>
       <body className={inter.className}>
-        <Providers>
-          {children}
-        </Providers>
+        <VantaBackground />
+        <div style={{position:'relative',zIndex:1}}>
+          <Providers>
+            {children}
+          </Providers>
+        </div>
       </body>
     </html>
   )
