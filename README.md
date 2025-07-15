@@ -90,7 +90,7 @@ big_finance/
 ### Launch App (`/launch`)
 - **Earn Tab**: Current APY and locked amounts
 - **Portfolio Tab**: User's staked assets and rewards
-- **xUSD/xETH/xBTC Tabs**: Individual token staking interfaces
+- **BIG USDC/BIG ETH/BIG BTC Tabs**: Individual token staking interfaces
 - **Wallet Connection**: Multi-wallet support
 - **Theme Toggle**: Light/dark mode
 

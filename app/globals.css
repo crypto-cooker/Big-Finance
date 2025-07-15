@@ -2,6 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Color Variables: Light Theme */
+:root {
+  --color-bg: #f8fafc;
+  --color-bg-gradient: linear-gradient(120deg, #f8fafc 0%, #e3e8ee 100%);
+  --color-card: #ffffffcc;
+  --color-panel: #f1f5f9cc;
+  --color-text: #181e2a;
+  --color-text-secondary: #475569;
+  --color-accent: #1ca7ec;
+  --color-accent2: #23d18b;
+  --color-border: #e2e8f0;
+  --color-btn: #1ca7ec;
+  --color-btn-text: #fff;
+  --color-btn-secondary: #fff;
+  --color-btn-secondary-text: #1ca7ec;
+}
+
+html.dark {
+  --color-bg: #10141c;
+  --color-bg-gradient: linear-gradient(120deg, #10141c 0%, #181e2a 100%);
+  --color-card: #181e2acc;
+  --color-panel: #232b3acc;
+  --color-text: #f5f7fa;
+  --color-text-secondary: #a3b1c6;
+  --color-accent: #1ca7ec;
+  --color-accent2: #23d18b;
+  --color-border: #232b3a;
+  --color-btn: #1ca7ec;
+  --color-btn-text: #fff;
+  --color-btn-secondary: transparent;
+  --color-btn-secondary-text: #f5f7fa;
+}
+
 /* Base styles */
 * {
   box-sizing: border-box;
@@ -15,14 +48,78 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Animated gradient background for BIG FI */
-  background: #10141C;
+  background: var(--color-bg-gradient);
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  color: #ffffff;
+  color: var(--color-text);
   margin: 0;
   padding: 0;
+  transition: background 0.4s cubic-bezier(0.4,0,0.2,1), color 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* Card, Panel, and Text Classes */
+.card, .bigfi-panel-solid {
+  background: var(--color-card);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 1.25rem;
+  box-shadow: 0 4px 32px 0 rgba(73, 98, 109, 0.08);
+  backdrop-filter: blur(2px);
+  transition: background 0.4s, color 0.4s, border-color 0.4s;
+}
+
+.bigfi-panel-solid {
+  background: var(--color-panel);
+}
+
+.text-primary {
+  color: var(--color-text);
+  transition: color 0.4s;
+}
+.text-secondary {
+  color: var(--color-text-secondary);
+  transition: color 0.4s;
+}
+
+.bg-primary {
+  background: var(--color-bg);
+  transition: background 0.4s;
+}
+.bg-card {
+  background: var(--color-card);
+  transition: background 0.4s;
+}
+.bg-panel {
+  background: var(--color-panel);
+  transition: background 0.4s;
+}
+
+.border-primary {
+  border-color: var(--color-border);
+  transition: border-color 0.4s;
+}
+
+.btn-primary {
+  background: var(--color-btn);
+  color: var(--color-btn-text);
+  transition: background 0.4s, color 0.4s;
+}
+
+.btn-secondary {
+  background: var(--color-btn-secondary);
+  color: var(--color-btn-secondary-text);
+  border: 1px solid var(--color-border);
+  transition: background 0.4s, color 0.4s, border-color 0.4s;
+}
+
+.gradient-text {
+  @apply text-transparent bg-clip-text;
+  background-image: linear-gradient(90deg, var(--color-accent), var(--color-accent2));
+}
+
+.gradient-bg {
+  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-accent2) 100%);
 }
 
 /* Custom animations */
@@ -166,7 +263,7 @@ textarea:focus {
 .bigfi-panel-solid {
   background: rgba(24, 30, 41, 0.96); /* nearly solid, but not pure black */
   border-radius: 16px;
-  box-shadow: 0 4px 32px 0 rgba(28,167,236,0.10);
+  box-shadow: 0 4px 32px 0 rgba(73, 98, 109, 0.1);
   border: 1px solid #232B3A;
   backdrop-filter: blur(2px);
 }

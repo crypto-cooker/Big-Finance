@@ -1,83 +1,125 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { ethers } from 'ethers';
 
+import ThemeToggle from './components/ThemeToggle';
+
+// Contract addresses (Sepolia)
+const CONTRACT_ADDRESSES = {
+  STAKING: "0xCc7e757Ea21464E7D23005c428DC9135F9de1C82",
+  USDC: "0xA77EDedba2ca1803f070840F9eC8E0E1AB6800Ce",
+  WETH: "0x5B0DfB0854E019a7C80B038f2cdEB92CE76Ff2ed",
+  WBTC: "0x744a75450fbD3E593DfDbAaB0074713DBc7ADf92"
+};
+
+// Minimal ABI for SimpleMultiTokenStaking
+const SimpleMultiTokenStakingABI = [
+  "function getTokenStats(address) view returns (uint256 tvl, uint256 tvlInUSDC, uint256 userCount, uint256 totalRewards)",
+  "function getTotalTVLInUSDC() view returns (uint256)"
+];
 
 const TOKENS = [
-  { 
-    symbol: 'USDC', 
-    name: 'USD Coin', 
-    locked: 68367729.33, 
-    apy: 20,
-    avatar: '/images/usdc.png',
-    description: 'This vault takes advantage of non-directional trades to earn high yield. This strategy simultaneously goes long and short, allowing it to collect funding from the short while not being exposed to downside.',
-    returnType: 'HIGH, variable',
-    risks: 'Execution failure, smart contract risk, custody risk'
-  },
-  { 
-    symbol: 'ETH', 
-    name: 'Ethereum', 
-    locked: 2823.1818, 
-    apy: 15,
-    avatar: '/images/eth.png',
-    description: 'Advanced yield strategies leveraging DeFi protocols for optimal returns. This vault optimizes liquidity provision and lending across multiple protocols to maximize ETH yields.',
-    returnType: 'MEDIUM, variable',
-    risks: 'Market volatility, smart contract risk, protocol risk'
-  },
-  { 
-    symbol: 'BTC', 
-    name: 'Bitcoin', 
-    locked: 75.5618, 
-    apy: 11,
-    avatar: '/images/btc.png',
-    description: 'Conservative yield farming with focus on capital preservation. This strategy prioritizes security and stability while generating consistent returns through low-risk lending protocols.',
-    returnType: 'LOW, stable',
-    risks: 'Market risk, smart contract risk, custody risk'
-  },
-]
+  { symbol: 'USDC', name: 'USD Coin', avatar: '/images/usdc.png', address: CONTRACT_ADDRESSES.USDC, apy: 20, description: 'This vault takes advantage of non-directional trades to earn high yield. This strategy simultaneously goes long and short, allowing it to collect funding from the short while not being exposed to downside.', returnType: 'HIGH, variable', risks: 'Execution failure, smart contract risk, custody risk' },
+  { symbol: 'ETH', name: 'Ethereum', avatar: '/images/eth.png', address: CONTRACT_ADDRESSES.WETH, apy: 20, description: 'Advanced yield strategies leveraging DeFi protocols for optimal returns. This vault optimizes liquidity provision and lending across multiple protocols to maximize ETH yields.', returnType: 'MEDIUM, variable', risks: 'Market volatility, smart contract risk, protocol risk' },
+  { symbol: 'BTC', name: 'Bitcoin', avatar: '/images/btc.png', address: CONTRACT_ADDRESSES.WBTC, apy: 20, description: 'Conservative yield farming with focus on capital preservation. This strategy prioritizes security and stability while generating consistent returns through low-risk lending protocols.', returnType: 'LOW, stable', risks: 'Market risk, smart contract risk, custody risk' },
+];
 
 const PROBLEMS = [
-  { title: 'Stalling DeFi Growth', icon: '📉' },
-  { title: 'Siloed Engines', icon: '🔒' },
-  { title: 'Inferior Products', icon: '❌' },
-  { title: 'Lack of Adaptability', icon: '🔄' },
+  { title: 'Stalling DeFi Growth'},
+  { title: 'Siloed Engines'},
+  { title: 'Inferior Products'},
+  { title: 'Lack of Adaptability'},
 ];
 
 const SOLUTIONS = [
-  { title: 'Blend TradFi and DeFi', icon: '🔗' },
-  { title: 'Competitive TradFi', icon: '⚡' },
-  { title: 'Spark Growth', icon: '🚀' },
-  { title: 'Better Yields', icon: '📈' },
+  { title: 'Blend TradFi and DeFi' },
+  { title: 'Competitive TradFi'},
+  { title: 'Spark Growth'},
+  { title: 'Better Yields'},
 ];
 
 export default function Home() {
-  const [selectedToken, setSelectedToken] = useState(TOKENS[0]); // Default to USDC
+  const [selectedToken, setSelectedToken] = useState(TOKENS[0]);
+  const [tokenStats, setTokenStats] = useState([
+    { locked: 0, apy: 20 },
+    { locked: 0, apy: 20 },
+    { locked: 0, apy: 20 },
+  ]);
+  const [totalTVL, setTotalTVL] = useState("0");
+
+  useEffect(() => {
+    async function fetchStats() {
+      // Use a public provider so wallet connect is never triggered
+      const provider = new ethers.JsonRpcProvider('https://sepolia.infura.io/v3/YOUR_INFURA_KEY'); // Replace with your key or a public RPC
+      const staking = new ethers.Contract(CONTRACT_ADDRESSES.STAKING, SimpleMultiTokenStakingABI, provider);
+      
+      // Fetch TVL for each token
+      const stats = await Promise.all(TOKENS.map(async (token, i) => {
+        try {
+          const s = await staking.getTokenStats(token.address);
+          return {
+            locked: Number(ethers.formatUnits(s[0], token.symbol === 'USDC' ? 6 : token.symbol === 'BTC' ? 8 : 18)),
+            apy: token.apy
+          };
+        } catch (e) {
+          return { locked: 0, apy: token.apy };
+        }
+      }));
+      setTokenStats(stats);
+      
+      // Fetch total TVL in USDC
+      try {
+        const tvl = await staking.getTotalTVLInUSDC();
+        setTotalTVL(Number(ethers.formatUnits(tvl, 6)).toLocaleString());
+      } catch (e) {
+        setTotalTVL("0");
+      }
+    }
+
+    fetchStats();
+
+    // Add event listener to refetch data when page becomes visible
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchStats();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup listener on component unmount
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
 
   return (
-    <div className="min-h-screen text-white">
+    <div className="min-h-screen bg-primary text-primary transition-colors duration-500 relative overflow-hidden">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-md border-b border-bigfi-blue/20">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-md border-b border-primary transition-colors duration-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 flex items-center justify-center text-slate-900 font-bold text-xl">
+              <div className="w-10 h-10 flex items-center justify-center font-bold text-xl">
                 <img src="/logo.png" alt="" />
               </div>
-              <a href='/' className="text-2xl font-bold bg-gradient-to-r from-bigfi-blue to-bigfi-teal bg-clip-text text-transparent cursor-pointer">
+              <a href='/' className="text-2xl font-bold gradient-text cursor-pointer">
                 BIG FI
               </a>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <a href="/how-it-works" className="text-bigfi-blue hover:text-bigfi-teal transition-colors">
+              <a href="/how-it-works" className="text-accent hover:text-accent2 transition-colors">
                 How it works
               </a>
-              <a href="/transparency" className="text-bigfi-blue hover:text-bigfi-teal transition-colors">
+              <a href="/transparency" className="text-accent hover:text-accent2 transition-colors">
                 Transparency
               </a>
-              <Link href="/launch" className="bg-gradient-to-r from-bigfi-blue to-bigfi-teal text-white px-6 py-2 rounded-lg font-semibold hover:from-bigfi-blue/80 hover:to-bigfi-teal/80 transition-all duration-200 shadow-lg">
+              <Link href="/launch" className="gradient-bg text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition-all duration-200 shadow-lg">
                 Launch App
               </Link>
+              <ThemeToggle />
             </div>
           </div>
         </div>
@@ -86,28 +128,23 @@ export default function Home() {
       {/* Hero Section */}
       <section className="pt-32 relative overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className=" text-center mb-20">
-            <div className="inline-flex items-center gap-2 bg-bigfi-blue/20 backdrop-blur-sm rounded-full px-6 py-3 mb-8 border border-bigfi-blue/30">
-              <span className="text-sm font-medium text-bigfi-gray">The Future of DeFi Yields</span>
-              <span className="text-bigfi-accent">✨</span>
+          <div className="text-center mb-20">
+            <div className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm rounded-full px-6 py-3 mb-8 border border-accent/30 transition-colors">
+              <span className="text-sm font-medium text-secondary">The Future of DeFi Yields</span>
+              <span className="text-accent">✨</span>
             </div>
-            
             <h1 className="text-6xl md:text-8xl font-bold mb-8 leading-tight">
               Yield Made<br />
-              <span className="bg-gradient-to-r from-bigfi-blue via-bigfi-btn to-bigfi-teal bg-clip-text text-transparent">
-                Extraordinary
-              </span>
+              <span className="gradient-text">Extraordinary</span>
             </h1>
-            
-            <p className="text-xl text-bigfi-gray max-w-2xl mx-auto mb-12 leading-relaxed">
+            <p className="text-xl text-secondary max-w-2xl mx-auto mb-12 leading-relaxed">
               Experience the next generation of DeFi with institutional-grade strategies accessible to everyone.
             </p>
-            
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/launch" className="bg-gradient-to-r from-bigfi-blue to-bigfi-teal text-white px-8 py-4 rounded-lg font-semibold text-lg hover:from-bigfi-blue/80 hover:to-bigfi-teal/80 transition-all duration-200 shadow-lg">
+              <Link href="/launch" className="gradient-bg text-white px-8 py-4 rounded-lg font-semibold text-lg hover:opacity-90 transition-all duration-200 shadow-lg">
                 Launch App
               </Link>
-              <Link href="/how-it-works" className="border border-bigfi-blue/50 text-bigfi-blue px-8 py-4 rounded-lg font-semibold text-lg hover:bg-bigfi-blue/10 transition-all duration-200">
+              <Link href="/how-it-works" className="border border-accent/50 text-accent px-8 py-4 rounded-lg font-semibold text-lg hover:bg-accent/10 transition-all duration-200">
                 Learn More
               </Link>
             </div>
@@ -116,26 +153,25 @@ export default function Home() {
       </section>
 
       {/* TVL Section */}
-      <section className='pt-20 pb-20 relative overflow-hidden bg-gradient-to-r from-bigfi-panel/80 via-bigfi-blue/10 to-bigfi-panel/80'>
+      <section className='pt-20 pb-20 relative bg-panel transition-colors duration-500 overflow-hidden'>
         <div className='relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-          <div className=" text-center mb-20">
-            <h2 className="text-2xl font-semibold mb-4 text-bigfi-blue">Total Value Locked</h2>
-            <div className="text-5xl font-bold bg-gradient-to-r from-bigfi-blue to-bigfi-teal bg-clip-text text-transparent mb-4">
-              $83.97M
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-semibold mb-4 text-accent">Total Value Locked</h2>
+            <div className="text-5xl font-bold gradient-text mb-4">
+              ${totalTVL}
             </div>
-            <div className="text-bigfi-gray text-sm">Securing the future of decentralized finance</div>
+            <div className="text-secondary text-lg">Securing the future of decentralized finance</div>
           </div>
-
-          {/* Token Cards - Now Interactive */}
+          {/* Token Card */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 ">
             {TOKENS.map((token, index) => (
               <div 
                 key={token.symbol} 
                 onClick={() => setSelectedToken(token)}
-                className={`bg-bigfi-panel/80 backdrop-blur-sm rounded-bigfi p-6 border transition-all duration-300 hover:shadow-lg hover:shadow-bigfi-blue/20 cursor-pointer ${
+                className={`card cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105 ${
                   selectedToken.symbol === token.symbol 
-                    ? 'border-bigfi-teal bg-bigfi-teal/10 shadow-lg shadow-bigfi-teal/20 scale-105' 
-                    : 'border-bigfi-blue/20 hover:border-bigfi-teal/40'
+                    ? 'border-accent2 bg-accent2/10 shadow-lg scale-105' 
+                    : 'border-primary hover:border-accent2/40'
                 }`}
               >
                 <div className="flex items-center gap-3 mb-4">
@@ -145,21 +181,20 @@ export default function Home() {
                     className="w-8 h-8 rounded-full transition-transform duration-200 hover:scale-110"
                   />
                   <div>
-                    <div className="text-xl font-bold text-bigfi-blue">{token.symbol}</div>
-                    <div className="text-bigfi-teal text-sm">{token.name}</div>
+                    <div className="text-xl font-bold text-accent">{token.symbol}</div>
+                    <div className="text-accent2 text-sm">{token.name}</div>
                   </div>
                 </div>
-                
                 <div className="space-y-4">
-                  <div className="text-3xl font-bold bg-gradient-to-r from-bigfi-blue to-bigfi-teal bg-clip-text text-transparent">
+                  <div className="text-3xl font-bold gradient-text">
                     {token.apy}% APY*
                   </div>
-                  <div className="text-sm text-bigfi-teal">
-                    Locked Value: {token.locked.toLocaleString()} {token.symbol}
+                  <div className="text-sm text-accent2">
+                    Locked Value: {tokenStats[index].locked.toLocaleString()} {token.symbol}
                   </div>
-                  <div className="w-full bg-bigfi-panel/60 rounded-full h-2">
+                  <div className="w-full bg-panel/60 rounded-full h-2">
                     <div 
-                      className="bg-gradient-to-r from-bigfi-blue to-bigfi-teal h-2 rounded-full transition-all duration-500" 
+                      className="gradient-bg h-2 rounded-full transition-all duration-500" 
                       style={{ width: `${Math.min(token.apy * 4, 100)}%` }}
                     ></div>
                   </div>
@@ -172,17 +207,17 @@ export default function Home() {
 
       {/* Problem Section */}
       <section className="py-20">
-        <div className=" max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-bigfi-blue">Problem: DeFi Limitations</h2>
-            <p className="text-xl text-bigfi-gray max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold mb-4 text-accent">Problem: DeFi Limitations</h2>
+            <p className="text-xl text-secondary max-w-3xl mx-auto">
               Traditional DeFi solutions face critical challenges that limit growth and accessibility for everyday users.
             </p>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {PROBLEMS.map((problem, index) => (
-              <div key={index} className="bg-gradient-to-r from-bigfi-panel/80 to-bigfi-blue/10 rounded-lg p-6 border border-bigfi-border text-center group">
+              <div key={index} className="bg-card transition-colors duration-500 rounded-lg p-6 border border-primary text-center group">
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto border border-red-500/30 group-hover:bg-red-500/30 transition-colors">
                   {/* Unique abstract SVGs for each card */}
                   {index === 0 && (
@@ -218,19 +253,19 @@ export default function Home() {
       </section>
 
       {/* Solution Section */}
-      <section className="py-20 bg-gradient-to-r from-bigfi-panel/80 via-bigfi-blue/10 to-bigfi-panel/80">
+      <section className="py-20 bg-panel transition-colors duration-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-bigfi-blue">Our Solution</h2>
-            <p className="text-xl text-bigfi-gray max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold mb-4 text-accent">Our Solution</h2>
+            <p className="text-xl text-secondary max-w-3xl mx-auto">
               Big FI bridges the gap between TradFi and DeFi, offering better yields and more accessible products.
             </p>
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {SOLUTIONS.map((solution, index) => (
-              <div key={index} className="bg-gradient-to-r from-bigfi-panel/80 to-bigfi-blue/10 p-6 border border-bigfi-border text-center rounded-lg group">
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto border border-bigfi-blue/30 group-hover:bg-bigfi-blue/20 transition-colors">
+              <div key={index} className="bg-card transition-colors duration-500 p-6 border border-primary text-center rounded-lg group">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto border border-primary group-hover:bg-primary/20 transition-colors">
                   {/* Unique abstract SVGs for each card */}
                   {index === 0 && (
                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -257,7 +292,7 @@ export default function Home() {
                     </svg>
                   )}
                 </div>
-                <div className="text-lg font-semibold text-bigfi-blue">+ {solution.title}</div>
+                <div className="text-lg font-semibold text-primary">+ {solution.title}</div>
               </div>
             ))}
           </div>
@@ -265,17 +300,17 @@ export default function Home() {
       </section>
 
       {/* Products Section */}
-      <section className="py-20 bg-bigfi-panel/80 backdrop-blur-sm">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-bigfi-blue">Our Products</h2>
-            <p className="text-xl text-bigfi-gray max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold mb-4 text-accent">Our Products</h2>
+            <p className="text-xl text-secondary max-w-3xl mx-auto">
               Revolutionary DeFi products designed for maximum capital efficiency and user experience.
             </p>
           </div>
 
           <div className="text-center mb-12">
-            <Link href="/launch" className="bg-gradient-to-r from-bigfi-blue to-bigfi-teal text-white px-8 py-4 rounded-lg font-semibold text-lg hover:from-bigfi-blue/80 hover:to-bigfi-teal/80 transition-all duration-200 shadow-lg">
+            <Link href="/launch" className="gradient-bg text-white px-8 py-4 rounded-lg font-semibold text-lg hover:opacity-90 transition-all duration-200 shadow-lg">
               Start Earning
             </Link>
           </div>
@@ -285,10 +320,10 @@ export default function Home() {
               <div 
                 key={index} 
                 onClick={() => setSelectedToken(token)}
-                className={`text-center bg-bigfi-panel/80 rounded-bigfi p-6 border transition-all duration-300 cursor-pointer ${
+                className={`text-center bg-card/80 rounded-bigfi p-6 border transition-all duration-300 cursor-pointer ${
                   selectedToken.symbol === token.symbol 
-                    ? 'border-bigfi-teal bg-bigfi-teal/10 shadow-lg shadow-bigfi-teal/20 scale-105' 
-                    : 'border-bigfi-blue/20 hover:border-bigfi-teal/40'
+                    ? 'border-accent2 bg-accent2/10 shadow-lg shadow-accent2/20 scale-105' 
+                    : 'border-primary hover:border-accent2/40'
                 }`}
               >
                 <div className="flex justify-center mb-4">
@@ -298,12 +333,12 @@ export default function Home() {
                     className="w-8 h-8 rounded-full transition-transform duration-200 hover:scale-110"
                   />
                 </div>
-                <div className="text-2xl font-bold mb-2 text-bigfi-blue">{token.symbol}</div>
-                <div className="text-3xl font-bold bg-gradient-to-r from-bigfi-blue to-bigfi-teal bg-clip-text text-transparent mb-4">
+                <div className="text-2xl font-bold mb-2 text-accent">{token.symbol}</div>
+                <div className="text-3xl font-bold gradient-text mb-4">
                   {token.apy}% APY*
                 </div>
-                <div className="text-sm text-bigfi-teal">
-                  TVL: ${(token.locked * (token.symbol === 'USDC' ? 1 : token.symbol === 'ETH' ? 2000 : 45000)).toLocaleString()}
+                <div className="text-sm text-accent2">
+                  TVL: ${tokenStats[index].locked.toLocaleString()}
                 </div>
                 
               </div>
@@ -311,7 +346,7 @@ export default function Home() {
           </div>
 
           {/* Dynamic Token Vault Info - Updates based on selected token */}
-          <div className="bg-gradient-to-r from-bigfi-panel/80 to-bigfi-blue/10 rounded-bigfi p-8 border border-bigfi-blue/20">
+          <div className="bg-card/80 rounded-bigfi p-8 border border-primary transition-colors duration-500">
             <div className="flex items-center gap-4 mb-6">
               <img 
                 src={selectedToken.avatar} 
@@ -319,25 +354,25 @@ export default function Home() {
                 className="w-12 h-12 rounded-full"
               />
               <div>
-                <h3 className="text-2xl font-bold text-bigfi-blue">{selectedToken.symbol} Premium Vault</h3>
-                <div className="text-2xl font-bold bg-gradient-to-r from-bigfi-blue to-bigfi-teal bg-clip-text text-transparent">
+                <h3 className="text-2xl font-bold text-accent">{selectedToken.symbol} Premium Vault</h3>
+                <div className="text-2xl font-bold gradient-text">
                   {selectedToken.apy}% APY*
                 </div>
               </div>
             </div>
-            <p className="text-bigfi-gray mb-6">{selectedToken.description}</p>
+            <p className="text-secondary mb-6">{selectedToken.description}</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-bigfi-panel/80 rounded-bigfi p-4 hover:bg-bigfi-panel/90 transition-colors">
-                <div className="text-bigfi-teal text-sm mb-2">Return Profile</div>
-                <div className="font-semibold text-bigfi-blue">{selectedToken.returnType}</div>
+              <div className="bg-card/80 rounded-bigfi p-4 hover:bg-card/90 transition-colors">
+                <div className="text-white text-md mb-2">Return Profile</div>
+                <div className="font-semibold text-secondary">{selectedToken.returnType}</div>
               </div>
-              <div className="bg-bigfi-panel/80 rounded-bigfi p-4 hover:bg-bigfi-panel/90 transition-colors">
-                <div className="text-bigfi-teal text-sm mb-2">Risk Assessment</div>
-                <div className="font-semibold text-bigfi-blue">{selectedToken.risks}</div>
+              <div className="bg-card/80 rounded-bigfi p-4 hover:bg-card/90 transition-colors">
+                <div className="text-white text-md mb-2">Risk Assessment</div>
+                <div className="font-semibold text-secondary">{selectedToken.risks}</div>
               </div>
-              <div className="bg-bigfi-panel/80 rounded-bigfi p-4 hover:bg-bigfi-panel/90 transition-colors">
-                <div className="text-bigfi-teal text-sm mb-2">Total Locked</div>
-                <div className="font-semibold text-bigfi-blue">{selectedToken.locked.toLocaleString()} {selectedToken.symbol}</div>
+              <div className="bg-card/80 rounded-bigfi p-4 hover:bg-card/90 transition-colors">
+                <div className="text-white text-md mb-2">Total Locked</div>
+                <div className="font-semibold text-secondary">{tokenStats[TOKENS.findIndex(t => t.symbol === selectedToken.symbol)].locked.toLocaleString()} {selectedToken.symbol}</div>
               </div>
             </div>
           </div>
@@ -345,17 +380,17 @@ export default function Home() {
       </section>
 
       {/* Build Section */}
-      <section className="py-20 bg-gradient-to-r from-bigfi-panel/80 via-bigfi-blue/10 to-bigfi-panel/80">
+      <section className="py-20 bg-panel transition-colors duration-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6 text-bigfi-blue">Build the Future with Big FI</h2>
-          <p className="text-xl text-bigfi-gray max-w-3xl mx-auto mb-8">
+          <h2 className="text-4xl font-bold mb-6 text-accent">Build the Future with Big FI</h2>
+          <p className="text-xl text-secondary max-w-3xl mx-auto mb-8">
             Join our ecosystem of innovative DeFi products that bridge traditional finance with decentralized opportunities.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-gradient-to-r from-bigfi-blue to-bigfi-teal text-white px-8 py-4 rounded-lg font-semibold hover:from-bigfi-blue/80 hover:to-bigfi-teal/80 transition-all duration-200 shadow-lg">
+            <button className="gradient-bg text-white px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-all duration-200 shadow-lg">
               Contact Us
             </button>
-            <Link href="/launch" className="border border-bigfi-blue/50 text-bigfi-blue px-8 py-4 rounded-lg font-semibold hover:bg-bigfi-blue/10 transition-all duration-200">
+            <Link href="/launch" className="border border-primary text-accent px-8 py-4 rounded-lg font-semibold hover:bg-primary/10 transition-all duration-200">
               Launch App
             </Link >
           </div>
@@ -363,12 +398,12 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="flex justify-between py-3 border-t border-bigfi-blue/20 bg-slate-900/80 px-[5%]">
+      <footer className="flex justify-between py-3 border-t border-primary bg-slate-900/80 px-[5%]">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 flex items-center justify-center text-slate-900 font-bold text-xl">
+          <div className="w-10 h-10 flex items-center justify-center font-bold text-xl">
             <img src="/logo.png" alt="" />
           </div>
-          <a href='/' className="text-2xl font-bold bg-gradient-to-r from-bigfi-blue to-bigfi-teal bg-clip-text text-transparent cursor-pointer">
+          <a href='/' className="text-2xl font-bold gradient-text cursor-pointer">
             BIG FI
           </a>
         </div>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './components/Providers'
-import VantaBackground from './components/VantaBackground'
+// import VantaBackground from './components/VantaBackground'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -35,7 +35,7 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico" />
       </head>
       <body className={inter.className}>
-        <VantaBackground />
+        {/* <VantaBackground /> */}
         <div style={{position:'relative',zIndex:1}}>
           <Providers>
             {children}
