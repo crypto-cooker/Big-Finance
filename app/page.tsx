@@ -3,21 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ethers } from 'ethers';
-
 import ThemeToggle from './components/ThemeToggle';
+import AnimatedBackground from './components/AnimatedBackground';
 
 // Contract addresses (Sepolia)
 const CONTRACT_ADDRESSES = {
-  STAKING: "0xCc7e757Ea21464E7D23005c428DC9135F9de1C82",
+  STAKING: "0xE1c2Af96216B08679500E7F82c367F6C3979f222",
   USDC: "0xA77EDedba2ca1803f070840F9eC8E0E1AB6800Ce",
   WETH: "0x5B0DfB0854E019a7C80B038f2cdEB92CE76Ff2ed",
   WBTC: "0x744a75450fbD3E593DfDbAaB0074713DBc7ADf92"
 };
 
-// Minimal ABI for SimpleMultiTokenStaking
+// ✅ FIXED: Correct ABI matching your actual contract
 const SimpleMultiTokenStakingABI = [
-  "function getTokenStats(address) view returns (uint256 tvl, uint256 tvlInUSDC, uint256 userCount, uint256 totalRewards)",
-  "function getTotalTVLInUSDC() view returns (uint256)"
+  "function getTokenStats(address) view returns (uint256 tvl, uint256 userCount, uint256 totalRewards)",
+  "function getAllTokenStats() view returns (address[] tokens, uint256[] tvls, uint256[] userCounts, uint256[] totalRewards)"
 ];
 
 const TOKENS = [
@@ -48,33 +48,107 @@ export default function Home() {
     { locked: 0, apy: 20 },
   ]);
   const [totalTVL, setTotalTVL] = useState("0");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStats() {
-      // Use a public provider so wallet connect is never triggered
-      const provider = new ethers.JsonRpcProvider('https://sepolia.infura.io/v3/YOUR_INFURA_KEY'); // Replace with your key or a public RPC
+      setIsLoading(true);
+      // ✅ FIXED: Use environment variable or public RPC properly
+      const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_INFURA_KEY_URL || 'https://sepolia.infura.io/v3/YOUR_INFURA_KEY');
       const staking = new ethers.Contract(CONTRACT_ADDRESSES.STAKING, SimpleMultiTokenStakingABI, provider);
       
-      // Fetch TVL for each token
-      const stats = await Promise.all(TOKENS.map(async (token, i) => {
-        try {
-          const s = await staking.getTokenStats(token.address);
-          return {
-            locked: Number(ethers.formatUnits(s[0], token.symbol === 'USDC' ? 6 : token.symbol === 'BTC' ? 8 : 18)),
-            apy: token.apy
-          };
-        } catch (e) {
-          return { locked: 0, apy: token.apy };
-        }
-      }));
-      setTokenStats(stats);
-      
-      // Fetch total TVL in USDC
       try {
-        const tvl = await staking.getTotalTVLInUSDC();
-        setTotalTVL(Number(ethers.formatUnits(tvl, 6)).toLocaleString());
-      } catch (e) {
+        // ✅ FIXED: Use getAllTokenStats first, then fallback to individual calls
+        let stats;
+        let calculatedTotalTVL = 0;
+        
+        try {
+          // Method 1: Try getAllTokenStats
+          const result = await staking.getAllTokenStats();
+          
+          stats = TOKENS.map((token, i) => {
+            // ✅ FIXED: Use correct decimals for each token
+            let decimals;
+            if (token.symbol === 'USDC') {
+              decimals = 6;
+            } else if (token.symbol === 'BTC') {
+              decimals = 8;
+            } else { // ETH
+              decimals = 18;
+            }
+            
+            const tvlFormatted = Number(ethers.formatUnits(result.tvls[i], decimals));
+            
+            // ✅ FIXED: Calculate total TVL by converting everything to USD equivalent
+            // For simplicity, assuming 1:1 for demo. In production, you'd use price feeds
+            let tvlInUSD = tvlFormatted;
+            if (token.symbol === 'ETH') {
+              tvlInUSD = tvlFormatted * 2000; // Rough ETH price for demo
+            } else if (token.symbol === 'BTC') {
+              tvlInUSD = tvlFormatted * 40000; // Rough BTC price for demo
+            }
+            calculatedTotalTVL += tvlInUSD;
+            
+            return {
+              locked: tvlFormatted,
+              apy: token.apy
+            };
+          });
+          
+        } catch (getAllError) {
+          console.log("getAllTokenStats not available, falling back to individual calls:", getAllError);
+          
+          // Method 2: Fallback to individual calls
+          stats = await Promise.all(TOKENS.map(async (token, i) => {
+            try {
+              const s = await staking.getTokenStats(token.address);
+              
+              // ✅ FIXED: Use correct decimals for each token
+              let decimals;
+              if (token.symbol === 'USDC') {
+                decimals = 6;
+              } else if (token.symbol === 'BTC') {
+                decimals = 8;
+              } else { // ETH
+                decimals = 18;
+              }
+              
+              const tvlFormatted = Number(ethers.formatUnits(s[0], decimals));
+              
+              // Calculate total TVL
+              let tvlInUSD = tvlFormatted;
+              if (token.symbol === 'ETH') {
+                tvlInUSD = tvlFormatted * 2000; // Rough ETH price for demo
+              } else if (token.symbol === 'BTC') {
+                tvlInUSD = tvlFormatted * 40000; // Rough BTC price for demo
+              }
+              calculatedTotalTVL += tvlInUSD;
+              
+              return {
+                locked: tvlFormatted,
+                apy: token.apy
+              };
+            } catch (tokenError) {
+              console.error(`Error fetching stats for ${token.symbol}:`, tokenError);
+              return { locked: 0, apy: token.apy };
+            }
+          }));
+        }
+        
+        setTokenStats(stats);
+        setTotalTVL(calculatedTotalTVL.toLocaleString(undefined, { maximumFractionDigits: 0 }));
+        
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+        // Set default values on error
+        setTokenStats([
+          { locked: 0, apy: 20 },
+          { locked: 0, apy: 20 },
+          { locked: 0, apy: 20 },
+        ]);
         setTotalTVL("0");
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -89,14 +163,20 @@ export default function Home() {
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Cleanup listener on component unmount
+    // ✅ FIXED: Add periodic refresh every 30 seconds
+    const interval = setInterval(fetchStats, 30000);
+
+    // Cleanup listener and interval on component unmount
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(interval);
     };
   }, []);
 
   return (
+    
     <div className="min-h-screen bg-primary text-primary transition-colors duration-500 relative overflow-hidden">
+      <AnimatedBackground />
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-md border-b border-primary transition-colors duration-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -126,7 +206,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 relative overflow-hidden">
+      <section className="pt-32 bg-panel/90 relative overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
             <div className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm rounded-full px-6 py-3 mb-8 border border-accent/30 transition-colors">
@@ -158,7 +238,12 @@ export default function Home() {
           <div className="text-center mb-10">
             <h2 className="text-2xl font-semibold mb-4 text-accent">Total Value Locked</h2>
             <div className="text-5xl font-bold gradient-text mb-4">
-              ${totalTVL}
+              {/* ✅ FIXED: Show loading state */}
+              {isLoading ? (
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
+              ) : (
+                `$${totalTVL}`
+              )}
             </div>
             <div className="text-secondary text-lg">Securing the future of decentralized finance</div>
           </div>
@@ -190,7 +275,8 @@ export default function Home() {
                     {token.apy}% APY*
                   </div>
                   <div className="text-sm text-accent2">
-                    Locked Value: {tokenStats[index].locked.toLocaleString()} {token.symbol}
+                    {/* ✅ FIXED: Better formatting and loading state */}
+                    Locked Value: {isLoading ? '...' : `${tokenStats[index].locked.toLocaleString()} ${token.symbol}`}
                   </div>
                   <div className="w-full bg-panel/60 rounded-full h-2">
                     <div 
@@ -206,7 +292,7 @@ export default function Home() {
       </section>
 
       {/* Problem Section */}
-      <section className="py-20">
+      <section className="py-20 bg-panel/90 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-accent">Problem: DeFi Limitations</h2>
@@ -253,7 +339,7 @@ export default function Home() {
       </section>
 
       {/* Solution Section */}
-      <section className="py-20 bg-panel transition-colors duration-500">
+      <section className="py-20 bg-panel relative transition-colors duration-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-accent">Our Solution</h2>
@@ -300,7 +386,7 @@ export default function Home() {
       </section>
 
       {/* Products Section */}
-      <section className="py-20">
+      <section className="py-20 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-accent">Our Products</h2>
@@ -338,7 +424,8 @@ export default function Home() {
                   {token.apy}% APY*
                 </div>
                 <div className="text-sm text-accent2">
-                  TVL: ${tokenStats[index].locked.toLocaleString()}
+                  {/* ✅ FIXED: Better display format */}
+                  TVL: {isLoading ? '...' : `${tokenStats[index].locked.toLocaleString()} ${token.symbol}`}
                 </div>
                 
               </div>
@@ -363,16 +450,19 @@ export default function Home() {
             <p className="text-secondary mb-6">{selectedToken.description}</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-card/80 rounded-bigfi p-4 hover:bg-card/90 transition-colors">
-                <div className="text-white text-md mb-2">Return Profile</div>
+                <div className="text-primary text-md mb-2">Return Profile</div>
                 <div className="font-semibold text-secondary">{selectedToken.returnType}</div>
               </div>
               <div className="bg-card/80 rounded-bigfi p-4 hover:bg-card/90 transition-colors">
-                <div className="text-white text-md mb-2">Risk Assessment</div>
+                <div className="text-primary text-md mb-2">Risk Assessment</div>
                 <div className="font-semibold text-secondary">{selectedToken.risks}</div>
               </div>
               <div className="bg-card/80 rounded-bigfi p-4 hover:bg-card/90 transition-colors">
-                <div className="text-white text-md mb-2">Total Locked</div>
-                <div className="font-semibold text-secondary">{tokenStats[TOKENS.findIndex(t => t.symbol === selectedToken.symbol)].locked.toLocaleString()} {selectedToken.symbol}</div>
+                <div className="text-primary text-md mb-2">Total Locked</div>
+                <div className="font-semibold text-secondary">
+                  {/* ✅ FIXED: Better loading state and formatting */}
+                  {isLoading ? '...' : `${tokenStats[TOKENS.findIndex(t => t.symbol === selectedToken.symbol)].locked.toLocaleString()} ${selectedToken.symbol}`}
+                </div>
               </div>
             </div>
           </div>
@@ -380,7 +470,7 @@ export default function Home() {
       </section>
 
       {/* Build Section */}
-      <section className="py-20 bg-panel transition-colors duration-500">
+      <section className="py-20 bg-panel relative transition-colors duration-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6 text-accent">Build the Future with Big FI</h2>
           <p className="text-xl text-secondary max-w-3xl mx-auto mb-8">
@@ -398,7 +488,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="flex justify-between py-3 border-t border-primary bg-slate-900/80 px-[5%]">
+      <footer className="flex justify-between relative py-3 border-t border-primary bg-slate-900/100 px-[5%]">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 flex items-center justify-center font-bold text-xl">
             <img src="/logo.png" alt="" />

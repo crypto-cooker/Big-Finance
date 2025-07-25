@@ -7,7 +7,7 @@ export default function ThemeToggle() {
     <button
       onClick={toggleTheme}
       aria-label="Toggle dark/light mode"
-      className="ml-4 p-2 rounded-full border border-bigfi-blue/30 bg-white/20 dark:bg-bigfi-panel/80 hover:bg-bigfi-blue/10 dark:hover:bg-bigfi-blue/20 transition-colors"
+      className="ml-4 p-2 rounded-full border border-bigfi-blue/30 bg-white/60 dark:bg-bigfi-panel/10 hover:bg-bigfi-blue/10 dark:hover:bg-bigfi-blue/20 transition-colors"
       style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
     >
       {theme === 'dark' ? (

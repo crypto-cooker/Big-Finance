@@ -4,6 +4,14 @@ import { useState, useEffect } from 'react'
 import ThemeToggle from '../components/ThemeToggle';
 import { ethers } from 'ethers';
 import { useSepoliaWallet } from "../hooks/useSepoliaWallet";
+import AnimatedBackground from '../components/AnimatedBackground';
+
+type TokenStat = {
+  symbol: string;
+  tvl: string;
+  userCount: number;
+  totalRewards: string;
+};
 
 const CONTRACT_ADDRESSES = {
   STAKING: "0xE1c2Af96216B08679500E7F82c367F6C3979f222",
@@ -16,7 +24,6 @@ const CONTRACT_ADDRESSES = {
 const SimpleMultiTokenStakingABI = [
   "function getUserInfo(address, address) view returns (uint256 amount, uint256 reward, uint256 unlockTime, uint256 timeRemaining, bool canWithdraw)",
   "function getTokenStats(address) view returns (uint256 tvl, uint256 userCount, uint256 totalRewards)", // Fixed to match contract
-  "function getAllTokenStats() view returns (address[] tokens, uint256[] tvls, uint256[] userCounts, uint256[] totalRewards)", // Added this function
   "function deposit(address token, uint256 amount) external",
   "function withdraw(address token) external"
 ];
@@ -46,7 +53,7 @@ export default function LaunchApp() {
   ]);
   const [txStatus, setTxStatus] = useState<string | null>(null);
   const [userTokenBalance, setUserTokenBalance] = useState<string>('0');
-  const [allTokenStats, setAllTokenStats] = useState([
+  const [allTokenStats, setAllTokenStats] = useState<TokenStat[]>([
     { symbol: 'USDC', tvl: '0', userCount: 0, totalRewards: '0' },
     { symbol: 'ETH', tvl: '0', userCount: 0, totalRewards: '0' },
     { symbol: 'BTC', tvl: '0', userCount: 0, totalRewards: '0' },
@@ -64,46 +71,32 @@ export default function LaunchApp() {
   // Improved stats fetching with better error handling
   async function fetchAllTokenStats() {
     if (!publicProvider) {
-      console.log("No public provider available");
       return;
     }
     
     setStatsLoading(true);
-    console.log("Fetching all token stats...");
-    
-    try {
-      // Method 1: Try using getAllTokenStats if available
-      try {
-        const result = await staking.getAllTokenStats();
-        console.log("getAllTokenStats result:", result);
-        
-        const stats = TOKENS.map((token, i) => ({
-          symbol: token.symbol,
-          tvl: ethers.formatUnits(result.tvls[i], token.symbol === 'USDC' ? 6 : token.symbol === 'BTC' ? 8 : 18),
-          userCount: Number(result.userCounts[i]),
-          totalRewards: ethers.formatUnits(result.totalRewards[i], token.symbol === 'USDC' ? 6 : token.symbol === 'BTC' ? 8 : 18),
-        }));
-        
-        setAllTokenStats(stats);
-        console.log("Successfully fetched stats using getAllTokenStats:", stats);
-        setStatsLoading(false);
-        return;
-      } catch (getAllError) {
-        console.log("getAllTokenStats not available, falling back to individual calls:", getAllError);
-      }
 
-      // Method 2: Fallback to individual calls
+    // const staking = new ethers.Contract(CONTRACT_ADDRESSES.STAKING, SimpleMultiTokenStakingABI, provider);
+    try {
       const stats = await Promise.all(TOKENS.map(async (token, i) => {
         try {
-          console.log(`Fetching stats for ${token.symbol} at address ${token.address}`);
           const s = await staking.getTokenStats(token.address);
-          console.log(`Stats for ${token.symbol}:`, s);
+          console.log("selectedt token's stats", s );
+          
+          let decimals;
+          if (token.symbol === 'USDC') {
+            decimals = 6;
+          } else if (token.symbol === 'BTC') {
+            decimals = 8;
+          } else { // ETH and others
+            decimals = 18;
+          }
           
           return {
             symbol: token.symbol,
-            tvl: ethers.formatUnits(s[0], token.symbol === 'USDC' ? 6 : token.symbol === 'BTC' ? 8 : 18),
+            tvl: ethers.formatUnits(s[0], decimals),
             userCount: Number(s[1]),
-            totalRewards: ethers.formatUnits(s[2], token.symbol === 'USDC' ? 6 : token.symbol === 'BTC' ? 8 : 18),
+            totalRewards: ethers.formatUnits(s[2], decimals),
           };
         } catch (tokenError) {
           console.error(`Error fetching stats for ${token.symbol}:`, tokenError);
@@ -112,10 +105,8 @@ export default function LaunchApp() {
       }));
       
       setAllTokenStats(stats);
-      console.log("Successfully fetched stats using individual calls:", stats);
-      
     } catch (error) {
-      console.error("Error fetching all token stats:", error);
+      console.error("Error fetching each token's stats:", error);
       setAllTokenStats([
         { symbol: 'USDC', tvl: '0', userCount: 0, totalRewards: '0' },
         { symbol: 'ETH', tvl: '0', userCount: 0, totalRewards: '0' },
@@ -129,6 +120,7 @@ export default function LaunchApp() {
   // Refactored user info fetch
   async function fetchUserInfos() {
     if (!provider || !userAddress) return;
+
     const staking = new ethers.Contract(CONTRACT_ADDRESSES.STAKING, SimpleMultiTokenStakingABI, provider);
     try {
       const infos = await Promise.all(TOKENS.map(async (token, i) => {
@@ -175,10 +167,8 @@ export default function LaunchApp() {
 
   // Updated: Periodically refresh token stats every 15 seconds
   useEffect(() => {
-    console.log("Component mounted, fetching initial stats...");
     fetchAllTokenStats();
     const interval = setInterval(() => {
-      console.log("Interval triggered, fetching stats...");
       fetchAllTokenStats();
     }, 15000);
     return () => clearInterval(interval);
@@ -219,6 +209,7 @@ export default function LaunchApp() {
       await fetchUserInfos();
       await fetchUserTokenBalance();
       await fetchAllTokenStats();
+      setTimeout(() => setTxStatus(null), 2000);
     } catch (e: any) {
       let msg = e?.message || e;
       if (e?.code === 4001 || msg.toLowerCase().includes('user rejected') || msg.toLowerCase().includes('user denied')) {
@@ -243,6 +234,7 @@ export default function LaunchApp() {
       await fetchUserInfos();
       await fetchUserTokenBalance();
       await fetchAllTokenStats();
+      setTimeout(() => setTxStatus(null), 2000);
     } catch (e: any) {
       let msg = e?.message || e;
       if (e?.code === 4001 || msg.toLowerCase().includes('user rejected') || msg.toLowerCase().includes('user denied')) {
@@ -258,6 +250,7 @@ export default function LaunchApp() {
 
   return (
     <div className="min-h-screen bg-primary text-primary transition-colors duration-500 relative overflow-hidden">
+      <AnimatedBackground />
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-md border-b border-primary transition-colors duration-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -319,7 +312,7 @@ export default function LaunchApp() {
           </div>
 
           {/* Token Status Cards with loading indicator */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             {statsLoading && (
               <div className="col-span-full text-center text-secondary">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
@@ -340,7 +333,7 @@ export default function LaunchApp() {
           </div>
 
           {/* Debug info - remove in production */}
-          <div className="mb-4 p-4 bg-panel/50 rounded-lg text-xs text-secondary">
+          <div className="mb-4 p-4 bg-panel/50 rounded-lg text-xs text-secondary space-y-2">
             <p>Public Provider: {publicProvider ? 'Connected' : 'Not Connected'}</p>
             <p>Stats Loading: {statsLoading ? 'Yes' : 'No'}</p>
             <p>Last Updated: {new Date().toLocaleTimeString()}</p>
@@ -398,13 +391,13 @@ export default function LaunchApp() {
                 <div className="flex border-b border-primary transition-colors duration-300 mb-6">
                   <button
                     className={`flex-1 py-3 text-lg font-semibold transition-all duration-200 ${tab === 'stake' ? 'text-primary border-b-2 border-primary bg-gradient-to-r from-primary/10 to-accent/10' : 'text-secondary'}`}
-                    onClick={() => setTab('stake')}
+                    onClick={() => { setTab('stake'); setTxStatus(null); }}
                   >
                     Deposit
                   </button>
                   <button
                     className={`flex-1 py-3 text-lg font-semibold transition-all duration-200 ${tab === 'withdraw' ? 'text-primary border-b-2 border-primary bg-gradient-to-r from-primary/10 to-accent/10' : 'text-secondary'}`}
-                    onClick={() => setTab('withdraw')}
+                    onClick={() => { setTab('withdraw'); setTxStatus(null); }}
                   >
                     Withdraw
                   </button>
@@ -430,13 +423,12 @@ export default function LaunchApp() {
                     <div className="mb-1 text-secondary text-sm">Available to deposit: <span className="text-primary font-medium">{availableToDeposit} {selectedToken.symbol}</span></div>
                     <div className="mb-1 text-xs text-secondary">CA: <span className="text-primary font-medium">{selectedToken.address}</span></div>
                     <div className="mb-2 text-sm text-secondary">The vault token for this strategy is <span className="text-accent font-semibold cursor-pointer">{selectedToken.vaultToken}</span></div>
-                    <button className="w-full mt-4 bg-primary transition-colors duration-200 hover:bg-primary-dark text-white text-lg font-semibold py-3 rounded-bigfi disabled:opacity-60"
+                    <button className="flex w-1/4 mx-auto justify-center mt-4 bg-primary border border-gray-600 transition-colors duration-200 hover:bg-primary-dark text-accent text-lg font-semibold py-3 rounded-bigfi disabled:opacity-60"
                       onClick={handleDeposit}
-                      disabled={!amount || Number(amount) <= 0 || !userAddress}
+                      disabled={!amount || Number(amount) <= 0 || !userAddress || !!txStatus}
                     >
-                      Deposit
+                      {txStatus ? txStatus : "Deposit"}
                     </button>
-                    {txStatus && <div className="mt-2 text-xs text-secondary">{txStatus}</div>}
                   </>
                 ) : (
                   <>
@@ -457,18 +449,12 @@ export default function LaunchApp() {
                     <div className="mb-1 text-xs text-secondary">1 {selectedToken.symbol} ≈ {withdrawRate} {selectedToken.vaultToken}</div>
                     <div className="mb-1 text-secondary text-sm">Available balance: <span className="text-primary font-medium">{availableToWithdraw}.{selectedToken.vaultToken}</span></div>
                     <div className="mb-2 text-sm text-secondary">CA: <span className="text-primary font-bold">{selectedToken.address}</span></div>
-                    <button className="w-full mt-4 bg-primary transition-colors duration-200 hover:bg-primary-dark text-white text-lg font-semibold py-3 rounded-bigfi disabled:opacity-60"
+                    <button className="flex w-1/4 mx-auto justify-center mt-4 border border-gray-600 bg-primary transition-colors duration-200 hover:bg-primary-dark text-accent text-lg font-semibold py-3 rounded-bigfi disabled:opacity-60"
                       onClick={handleWithdraw}
-                      disabled={!userAddress}
+                      disabled={!userAddress || !!txStatus}
                     >
-                      Queue Withdraw
+                      {txStatus ? txStatus : "Queue Withdraw"}
                     </button>
-                    {txStatus && <div className="mt-2 text-xs text-secondary">{txStatus}</div>}
-                    <div className="mt-3 text-xs text-secondary">Once you queue the withdrawal, you will have to wait until approximately one day to complete it and get your funds.</div>
-                    <div className="mt-3 text-xs text-secondary">
-                      Unlock Time: <span className="text-accent">{userInfos[TOKENS.findIndex(t => t.symbol === selectedToken.symbol)]?.unlockTime && userInfos[TOKENS.findIndex(t => t.symbol === selectedToken.symbol)]?.amount > 0 ? new Date(userInfos[TOKENS.findIndex(t => t.symbol === selectedToken.symbol)]?.unlockTime * 1000).toLocaleString() : '---'}</span>
-                      &nbsp;|&nbsp; Can Withdraw: <span className="text-accent">{userInfos[TOKENS.findIndex(t => t.symbol === selectedToken.symbol)]?.amount > 0 ? (userInfos[TOKENS.findIndex(t => t.symbol === selectedToken.symbol)]?.canWithdraw ? 'Yes' : 'No') : 'No'}</span>
-                    </div>
                   </>
                 )}
               </div>
