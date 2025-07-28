@@ -54,7 +54,7 @@ export default function Home() {
     async function fetchStats() {
       setIsLoading(true);
       // ✅ FIXED: Use environment variable or public RPC properly
-      const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_INFURA_KEY_URL || 'https://sepolia.infura.io/v3/YOUR_INFURA_KEY');
+      const provider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_RPC_URL || 'https://sepolia.infura.io/v3/YOUR_INFURA_KEY');
       const staking = new ethers.Contract(CONTRACT_ADDRESSES.STAKING, SimpleMultiTokenStakingABI, provider);
       
       try {

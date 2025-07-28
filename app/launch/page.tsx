@@ -3,42 +3,55 @@
 import { useState, useEffect } from 'react'
 import ThemeToggle from '../components/ThemeToggle';
 import { ethers } from 'ethers';
-import { useSepoliaWallet } from "../hooks/useSepoliaWallet";
+import { useArbitrumWallet } from "../hooks/useArbitrumWallet";
+import { useStaking } from "../hooks/useStaking";
 import AnimatedBackground from '../components/AnimatedBackground';
+import StakingInfo from '../components/StakingInfo';
+import { ADDRESSES } from '../constants';
+import stakingAbi from '../abis/staking.json';
 
 type TokenStat = {
   symbol: string;
   tvl: string;
-  userCount: number;
-  totalRewards: string;
 };
-
-const CONTRACT_ADDRESSES = {
-  STAKING: "0xE1c2Af96216B08679500E7F82c367F6C3979f222",
-  USDC: "0xA77EDedba2ca1803f070840F9eC8E0E1AB6800Ce",
-  WETH: "0x5B0DfB0854E019a7C80B038f2cdEB92CE76Ff2ed",
-  WBTC: "0x744a75450fbD3E593DfDbAaB0074713DBc7ADf92"
-};
-
-// Fixed ABI - should match contract exactly
-const SimpleMultiTokenStakingABI = [
-  "function getUserInfo(address, address) view returns (uint256 amount, uint256 reward, uint256 unlockTime, uint256 timeRemaining, bool canWithdraw)",
-  "function getTokenStats(address) view returns (uint256 tvl, uint256 userCount, uint256 totalRewards)", // Fixed to match contract
-  "function deposit(address token, uint256 amount) external",
-  "function withdraw(address token) external"
-];
-
-const ERC20_ABI = [
-  "function approve(address spender, uint256 amount) public returns (bool)",
-  "function allowance(address owner, address spender) public view returns (uint256)",
-  "function decimals() view returns (uint8)",
-  "function balanceOf(address owner) view returns (uint256)"
-];
 
 const TOKENS = [
-  { symbol: 'USDC', name: 'USD Coin', avatar: '/images/usdc.png', address: CONTRACT_ADDRESSES.USDC, vaultToken: 'BIG USDC', apy: 20, description: 'This vault takes advantage of non-directional trades to earn high yield.', returnType: 'HIGH, variable', risks: 'Execution failure, smart contract risk, custody risk' },
-  { symbol: 'ETH', name: 'Ethereum', avatar: '/images/eth.png', address: CONTRACT_ADDRESSES.WETH, vaultToken: 'BIG ETH', apy: 20, description: 'Advanced yield strategies leveraging DeFi protocols for optimal returns.', returnType: 'MEDIUM, variable', risks: 'Market volatility, smart contract risk, protocol risk' },
-  { symbol: 'BTC', name: 'Bitcoin', avatar: '/images/btc.png', address: CONTRACT_ADDRESSES.WBTC, vaultToken: 'BIG BTC', apy: 20, description: 'Conservative yield farming with focus on capital preservation.', returnType: 'LOW, stable', risks: 'Market risk, smart contract risk, custody risk' },
+  { 
+    symbol: 'USDC', 
+    name: 'USD Coin', 
+    avatar: '/images/usdc.png', 
+    address: ADDRESSES.USDC, 
+    vaultToken: 'BIG USDC', 
+    apy: 20, 
+    description: 'This vault takes advantage of non-directional trades to earn high yield.', 
+    returnType: 'HIGH, variable', 
+    risks: 'Execution failure, smart contract risk, custody risk',
+    decimals: 6
+  },
+  { 
+    symbol: 'ETH', 
+    name: 'Ethereum', 
+    avatar: '/images/eth.png', 
+    address: ADDRESSES.WETH, 
+    vaultToken: 'BIG ETH', 
+    apy: 20, 
+    description: 'Advanced yield strategies leveraging DeFi protocols for optimal returns.', 
+    returnType: 'MEDIUM, variable', 
+    risks: 'Market volatility, smart contract risk, protocol risk',
+    decimals: 18
+  },
+  { 
+    symbol: 'WBTC', 
+    name: 'Wrapped Bitcoin', 
+    avatar: '/images/btc.png', 
+    address: ADDRESSES.WBTC, 
+    vaultToken: 'BIG WBTC', 
+    apy: 20, 
+    description: 'Conservative yield farming with focus on capital preservation.', 
+    returnType: 'LOW, stable', 
+    risks: 'Market risk, smart contract risk, custody risk',
+    decimals: 8
+  },
 ];
 
 export default function LaunchApp() {
@@ -46,207 +59,193 @@ export default function LaunchApp() {
   const [amount, setAmount] = useState('')
   const [withdrawAmount, setWithdrawAmount] = useState('')
   const [tab, setTab] = useState<'stake' | 'withdraw'>('stake')
-  const [userInfos, setUserInfos] = useState([
-    { amount: 0, reward: 0, unlockTime: 0, canWithdraw: false },
-    { amount: 0, reward: 0, unlockTime: 0, canWithdraw: false },
-    { amount: 0, reward: 0, unlockTime: 0, canWithdraw: false },
-  ]);
   const [txStatus, setTxStatus] = useState<string | null>(null);
-  const [userTokenBalance, setUserTokenBalance] = useState<string>('0');
   const [allTokenStats, setAllTokenStats] = useState<TokenStat[]>([
-    { symbol: 'USDC', tvl: '0', userCount: 0, totalRewards: '0' },
-    { symbol: 'ETH', tvl: '0', userCount: 0, totalRewards: '0' },
-    { symbol: 'BTC', tvl: '0', userCount: 0, totalRewards: '0' },
+    { symbol: 'USDC', tvl: '0' },
+    { symbol: 'ETH', tvl: '0' },
+    { symbol: 'WBTC', tvl: '0' },
   ]);
   const [statsLoading, setStatsLoading] = useState(false);
 
-  const { address: userAddress, provider, signer, error, connectSepolia, disconnect, isClient } = useSepoliaWallet();
+  const { address: userAddress, provider, signer, error, connectArbitrum, disconnect, isClient } = useArbitrumWallet();
+  const { 
+    stakingData, 
+    loading: stakingLoading, 
+    error: stakingError, 
+    fetchStakingData,
+    stakeUSDC,
+    stakeWBTC,
+    stakeETH,
+    unstakeUSDC,
+    unstakeWBTC,
+    unstakeETH
+  } = useStaking(provider, signer, userAddress);
 
-  // Use a public provider for Sepolia
-  const publicProvider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_INFURA_KEY_URL);
+  // Use a public provider for Arbitrum
+  const publicProvider = new ethers.JsonRpcProvider(process.env.NEXT_PUBLIC_ARBITRUM_RPC_URL || 'https://arb1.arbitrum.io/rpc');
 
-  // Always use publicProvider for stats
-  const staking = new ethers.Contract(CONTRACT_ADDRESSES.STAKING, SimpleMultiTokenStakingABI, publicProvider);
-
-  // Improved stats fetching with better error handling
+  // Fetch total staked amounts for stats
   async function fetchAllTokenStats() {
-    if (!publicProvider) {
-      return;
-    }
+    if (!publicProvider) return;
     
     setStatsLoading(true);
 
-    // const staking = new ethers.Contract(CONTRACT_ADDRESSES.STAKING, SimpleMultiTokenStakingABI, provider);
     try {
-      const stats = await Promise.all(TOKENS.map(async (token, i) => {
-        try {
-          const s = await staking.getTokenStats(token.address);
-          console.log("selectedt token's stats", s );
-          
-          let decimals;
-          if (token.symbol === 'USDC') {
-            decimals = 6;
-          } else if (token.symbol === 'BTC') {
-            decimals = 8;
-          } else { // ETH and others
-            decimals = 18;
-          }
-          
-          return {
-            symbol: token.symbol,
-            tvl: ethers.formatUnits(s[0], decimals),
-            userCount: Number(s[1]),
-            totalRewards: ethers.formatUnits(s[2], decimals),
-          };
-        } catch (tokenError) {
-          console.error(`Error fetching stats for ${token.symbol}:`, tokenError);
-          return { symbol: token.symbol, tvl: '0', userCount: 0, totalRewards: '0' };
-        }
-      }));
+      const stakingContract = new ethers.Contract(ADDRESSES.STAKING, stakingAbi, publicProvider);
       
-      setAllTokenStats(stats);
-    } catch (error) {
-      console.error("Error fetching each token's stats:", error);
-      setAllTokenStats([
-        { symbol: 'USDC', tvl: '0', userCount: 0, totalRewards: '0' },
-        { symbol: 'ETH', tvl: '0', userCount: 0, totalRewards: '0' },
-        { symbol: 'BTC', tvl: '0', userCount: 0, totalRewards: '0' },
+      const [totalStakedUSDC, totalStakedETH, totalStakedWBTC] = await Promise.all([
+        stakingContract.totalStakedUSDC(),
+        stakingContract.totalStakedETH(),
+        stakingContract.totalStakedWBTC()
       ]);
+
+      setAllTokenStats([
+        { 
+          symbol: 'USDC', 
+          tvl: ethers.formatUnits(totalStakedUSDC, 6)
+        },
+        { 
+          symbol: 'ETH', 
+          tvl: ethers.formatEther(totalStakedETH)
+        },
+        { 
+          symbol: 'WBTC', 
+          tvl: ethers.formatUnits(totalStakedWBTC, 8)
+        },
+      ]);
+    } catch (error) {
+      console.error("Error fetching token stats:", error);
     } finally {
       setStatsLoading(false);
     }
   }
 
-  // Refactored user info fetch
-  async function fetchUserInfos() {
-    if (!provider || !userAddress) return;
-
-    const staking = new ethers.Contract(CONTRACT_ADDRESSES.STAKING, SimpleMultiTokenStakingABI, provider);
-    try {
-      const infos = await Promise.all(TOKENS.map(async (token, i) => {
-        try {
-          const info = await staking.getUserInfo(userAddress, token.address);
-          return {
-            amount: Number(ethers.formatUnits(info[0], token.symbol === 'USDC' ? 6 : token.symbol === 'BTC' ? 8 : 18)),
-            reward: Number(ethers.formatUnits(info[1], token.symbol === 'USDC' ? 6 : token.symbol === 'BTC' ? 8 : 18)),
-            unlockTime: Number(info[2]),
-            canWithdraw: info[4]
-          };
-        } catch (e) {
-          console.error(`Error fetching user info for ${token.symbol}:`, e);
-          return { amount: 0, reward: 0, unlockTime: 0, canWithdraw: false };
-        }
-      }));
-      setUserInfos(infos);
-    } catch (e) {
-      console.error("Error fetching user infos:", e);
-      setUserInfos([
-        { amount: 0, reward: 0, unlockTime: 0, canWithdraw: false },
-        { amount: 0, reward: 0, unlockTime: 0, canWithdraw: false },
-        { amount: 0, reward: 0, unlockTime: 0, canWithdraw: false },
-      ]);
+  // Get user's staked amount for selected token
+  const getUserStakedAmount = () => {
+    switch (selectedToken.symbol) {
+      case 'USDC':
+        return stakingData.usdcStaked;
+      case 'ETH':
+        return stakingData.ethStaked;
+      case 'WBTC':
+        return stakingData.wbtcStaked;
+      default:
+        return '0';
     }
+  };
+
+  // Get user's reward for selected token
+  const getUserReward = () => {
+    switch (selectedToken.symbol) {
+      case 'USDC':
+        return stakingData.usdcReward;
+      case 'ETH':
+        return stakingData.ethReward;
+      case 'WBTC':
+        return stakingData.wbtcReward;
+      default:
+        return '0';
+    }
+  };
+
+  // Get user's balance for selected token
+  const getUserBalance = () => {
+    switch (selectedToken.symbol) {
+      case 'USDC':
+        return stakingData.usdcBalance;
+      case 'ETH':
+        return stakingData.ethBalance;
+      case 'WBTC':
+        return stakingData.wbtcBalance;
+      default:
+        return '0';
+    }
+  };
+
+  // Handle stake
+  async function handleStake() {
+    if (!amount || Number(amount) <= 0) return;
+    
+    setTxStatus('Processing...');
+    
+    try {
+      switch (selectedToken.symbol) {
+        case 'USDC':
+          await stakeUSDC(amount);
+          break;
+        case 'ETH':
+          await stakeETH(amount);
+          break;
+        case 'WBTC':
+          await stakeWBTC(amount);
+          break;
+      }
+      
+      setTxStatus('Stake successful!');
+      setAmount('');
+      await fetchAllTokenStats();
+    } catch (e: any) {
+      let msg = e?.message || e;
+      if (e?.code === 4001 || msg.toLowerCase().includes('user rejected') || msg.toLowerCase().includes('user denied')) {
+        msg = 'Transaction cancelled by user.';
+      }
+      setTxStatus('Stake failed: ' + msg);
+    }
+    
+    setTimeout(() => setTxStatus(null), 3000);
   }
 
-  // Fetch user's wallet balance for the selected token
-  async function fetchUserTokenBalance() {
-    if (!provider || !userAddress || !selectedToken?.address) {
-      setUserTokenBalance('0');
-      return;
-    }
+  // Handle unstake
+  async function handleUnstake() {
+    if (!withdrawAmount || Number(withdrawAmount) <= 0) return;
+    
+    setTxStatus('Processing...');
+    
     try {
-      const token = new ethers.Contract(selectedToken.address, ERC20_ABI, provider);
-      const decimals = await token.decimals();
-      const balance = await token.balanceOf(userAddress);
-      setUserTokenBalance(ethers.formatUnits(balance, decimals));
-    } catch (e) {
-      console.error('Error fetching token balance:', e);
-      setUserTokenBalance('0');
+      switch (selectedToken.symbol) {
+        case 'USDC':
+          await unstakeUSDC(withdrawAmount);
+          break;
+        case 'ETH':
+          await unstakeETH(withdrawAmount);
+          break;
+        case 'WBTC':
+          await unstakeWBTC(withdrawAmount);
+          break;
+      }
+      
+      setTxStatus('Unstake successful!');
+      setWithdrawAmount('');
+      await fetchAllTokenStats();
+    } catch (e: any) {
+      let msg = e?.message || e;
+      if (e?.code === 4001 || msg.toLowerCase().includes('user rejected') || msg.toLowerCase().includes('user denied')) {
+        msg = 'Transaction cancelled by user.';
+      }
+      setTxStatus('Unstake failed: ' + msg);
     }
+    
+    setTimeout(() => setTxStatus(null), 3000);
   }
 
-  // Updated: Periodically refresh token stats every 15 seconds
+  // Set max amount for stake
+  const setMaxStake = () => {
+    setAmount(getUserBalance());
+  };
+
+  // Set max amount for unstake
+  const setMaxUnstake = () => {
+    setWithdrawAmount(getUserStakedAmount());
+  };
+
+  // Fetch stats on mount
   useEffect(() => {
     fetchAllTokenStats();
     const interval = setInterval(() => {
       fetchAllTokenStats();
-    }, 15000);
+    }, 30000); // Refresh every 30 seconds
     return () => clearInterval(interval);
   }, []);
-
-  useEffect(() => {
-    fetchUserTokenBalance();
-  }, [selectedToken, userAddress, provider]);
-
-  useEffect(() => {
-    fetchUserInfos();
-  }, [userAddress, provider]);
-
-  async function handleDeposit() {
-    if (!signer || !userAddress) return;
-    setTxStatus('Waiting for approval...');
-    const staking = new ethers.Contract(CONTRACT_ADDRESSES.STAKING, SimpleMultiTokenStakingABI, signer);
-    const token = new ethers.Contract(selectedToken.address, ERC20_ABI, signer);
-    const gasPrice = ethers.parseUnits("5", "gwei");
-
-    const decimals = await token.decimals();
-    const parsedAmount = ethers.parseUnits(amount, decimals);
-    
-    try {
-      const allowance = await token.allowance(userAddress, CONTRACT_ADDRESSES.STAKING);
-      if (allowance < parsedAmount) {
-        const approveTx = await token.approve(CONTRACT_ADDRESSES.STAKING, parsedAmount, { gasLimit: 300000, gasPrice });
-        setTxStatus('Approving...');
-        await approveTx.wait();
-      }
-      
-      setTxStatus('Depositing...');
-      const depositTx = await staking.deposit(selectedToken.address, parsedAmount, { gasLimit: 300000, gasPrice });
-      await depositTx.wait();
-      setTxStatus('Deposit successful!');
-      
-      // Refresh all data
-      await fetchUserInfos();
-      await fetchUserTokenBalance();
-      await fetchAllTokenStats();
-      setTimeout(() => setTxStatus(null), 2000);
-    } catch (e: any) {
-      let msg = e?.message || e;
-      if (e?.code === 4001 || msg.toLowerCase().includes('user rejected') || msg.toLowerCase().includes('user denied')) {
-        msg = 'Transaction cancelled by user.';
-      }
-      setTxStatus('Deposit failed: ' + msg);
-    }
-  }
-
-  async function handleWithdraw() {
-    if (!signer || !userAddress) return;
-    setTxStatus('Withdrawing...');
-    const staking = new ethers.Contract(CONTRACT_ADDRESSES.STAKING, SimpleMultiTokenStakingABI, signer);
-    const gasPrice = ethers.parseUnits("5", "gwei");
-    
-    try {
-      const withdrawTx = await staking.withdraw(selectedToken.address, { gasLimit: 300000, gasPrice });
-      await withdrawTx.wait();
-      setTxStatus('Withdraw successful!');
-      
-      // Refresh all data
-      await fetchUserInfos();
-      await fetchUserTokenBalance();
-      await fetchAllTokenStats();
-      setTimeout(() => setTxStatus(null), 2000);
-    } catch (e: any) {
-      let msg = e?.message || e;
-      if (e?.code === 4001 || msg.toLowerCase().includes('user rejected') || msg.toLowerCase().includes('user denied')) {
-        msg = 'Transaction cancelled by user.';
-      }
-      setTxStatus('Withdraw failed: ' + msg);
-    }
-  }
-
-  const availableToDeposit = userTokenBalance;
-  const availableToWithdraw = 0;
-  const withdrawRate = 0.8;
 
   return (
     <div className="min-h-screen bg-primary text-primary transition-colors duration-500 relative overflow-hidden">
@@ -272,7 +271,7 @@ export default function LaunchApp() {
               </a>
               {!userAddress ? (
                 <button
-                  onClick={connectSepolia}
+                  onClick={connectArbitrum}
                   className="text-accent text-md font-bold uppercase bg-gradient-to-r from-accent to-accent2 px-4 py-2 rounded-lg shadow-lg border-b-2 border-t border-black border-opacity-20 hover:opacity-90 transition-all duration-200"
                 >
                   Connect Wallet
@@ -311,7 +310,7 @@ export default function LaunchApp() {
             <p className="text-xl text-secondary">The SuperApp DeFi Deserves</p>
           </div>
 
-          {/* Token Status Cards with loading indicator */}
+          {/* Token Status Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             {statsLoading && (
               <div className="col-span-full text-center text-secondary">
@@ -326,21 +325,14 @@ export default function LaunchApp() {
                   <span className="text-xl font-bold gradient-text">{stat.symbol}</span>
                 </div>
                 <div className="text-sm text-secondary mb-1">Total Value Locked: <span className="text-lg font-bold text-primary">{stat.tvl} {stat.symbol}</span></div>
-                <div className="text-sm text-secondary mb-1 mt-2">Users: <span className="text-lg font-bold text-primary">{stat.userCount}</span></div>
-                <div className="text-sm text-secondary mb-1 mt-2">Total Rewards: <span className="text-lg font-bold text-primary">{stat.totalRewards} {stat.symbol}</span></div>
+
+
               </div>
             ))}
           </div>
 
-          {/* Debug info - remove in production */}
-          <div className="mb-4 p-4 bg-panel/50 rounded-lg text-xs text-secondary space-y-2">
-            <p>Public Provider: {publicProvider ? 'Connected' : 'Not Connected'}</p>
-            <p>Stats Loading: {statsLoading ? 'Yes' : 'No'}</p>
-            <p>Last Updated: {new Date().toLocaleTimeString()}</p>
-          </div>
-
-          {/* Rest of your component remains the same... */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Interface */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Token Selection */}
             <div className="lg:col-span-1">
               <div className="bg-panel/80 backdrop-blur-sm rounded-bigfi p-8 border border-primary transition-colors duration-300">
@@ -367,15 +359,11 @@ export default function LaunchApp() {
                         </div>
                       </div>
                       <div className="text-2xl font-bold gradient-text">{token.apy}% APY*</div>
-                      <div className="text-sm text-accent">
-                        Staked: {userInfos[index].amount} {token.symbol}
-                      </div>
                       {userAddress && (
                         <div className="text-xs text-secondary mt-2">
-                          <div>Staked: {userInfos[index].amount} {token.symbol}</div>
-                          <div>Reward: {userInfos[index].reward} {token.symbol}</div>
-                          <div>Unlock: {userInfos[index].unlockTime && userInfos[index].amount > 0 ? new Date(userInfos[index].unlockTime * 1000).toLocaleString() : '---'} </div>
-                          <div>Can Withdraw: {userInfos[index].amount > 0 ? (userInfos[index].canWithdraw ? 'Yes' : 'No') : 'No'}</div>
+                          <div>Staked: {token.symbol === 'USDC' ? parseFloat(stakingData.usdcStaked).toFixed(2) : token.symbol === 'ETH' ? parseFloat(stakingData.ethStaked).toFixed(4) : parseFloat(stakingData.wbtcStaked).toFixed(6)} {token.symbol}</div>
+                          <div>Reward: {token.symbol === 'USDC' ? parseFloat(stakingData.usdcReward).toFixed(2) : token.symbol === 'ETH' ? parseFloat(stakingData.ethReward).toFixed(4) : parseFloat(stakingData.wbtcReward).toFixed(6)} {token.symbol}</div>
+                          <div>Balance: {token.symbol === 'USDC' ? parseFloat(stakingData.usdcBalance).toFixed(2) : token.symbol === 'ETH' ? parseFloat(stakingData.ethBalance).toFixed(4) : parseFloat(stakingData.wbtcBalance).toFixed(6)} {token.symbol}</div>
                         </div>
                       )}
                     </button>
@@ -393,13 +381,13 @@ export default function LaunchApp() {
                     className={`flex-1 py-3 text-lg font-semibold transition-all duration-200 ${tab === 'stake' ? 'text-primary border-b-2 border-primary bg-gradient-to-r from-primary/10 to-accent/10' : 'text-secondary'}`}
                     onClick={() => { setTab('stake'); setTxStatus(null); }}
                   >
-                    Deposit
+                    Stake
                   </button>
                   <button
                     className={`flex-1 py-3 text-lg font-semibold transition-all duration-200 ${tab === 'withdraw' ? 'text-primary border-b-2 border-primary bg-gradient-to-r from-primary/10 to-accent/10' : 'text-secondary'}`}
                     onClick={() => { setTab('withdraw'); setTxStatus(null); }}
                   >
-                    Withdraw
+                    Unstake
                   </button>
                 </div>
 
@@ -414,20 +402,25 @@ export default function LaunchApp() {
                         placeholder="0.00"
                         className="flex-1 bg-transparent outline-none text-lg text-primary placeholder-secondary"
                       />
-                      <button className="mx-2 text-accent font-bold text-sm">MAX</button>
+                      <button 
+                        className="mx-2 text-accent font-bold text-sm hover:opacity-80"
+                        onClick={setMaxStake}
+                      >
+                        MAX
+                      </button>
                       <span className="flex items-center gap-1 text-secondary font-semibold">
                         <img src={selectedToken.avatar} alt="" className="w-6 h-6 inline-block rounded-full mr-1" />
                         {selectedToken.symbol}
                       </span>
                     </div>
-                    <div className="mb-1 text-secondary text-sm">Available to deposit: <span className="text-primary font-medium">{availableToDeposit} {selectedToken.symbol}</span></div>
-                    <div className="mb-1 text-xs text-secondary">CA: <span className="text-primary font-medium">{selectedToken.address}</span></div>
+                    <div className="mb-1 text-secondary text-sm">Available to stake: <span className="text-primary font-medium">{getUserBalance()} {selectedToken.symbol}</span></div>
                     <div className="mb-2 text-sm text-secondary">The vault token for this strategy is <span className="text-accent font-semibold cursor-pointer">{selectedToken.vaultToken}</span></div>
-                    <button className="flex w-1/4 mx-auto justify-center mt-4 bg-primary border border-gray-600 transition-colors duration-200 hover:bg-primary-dark text-accent text-lg font-semibold py-3 rounded-bigfi disabled:opacity-60"
-                      onClick={handleDeposit}
-                      disabled={!amount || Number(amount) <= 0 || !userAddress || !!txStatus}
+                    <button 
+                      className="flex w-1/4 mx-auto justify-center mt-4 bg-primary border border-gray-600 transition-colors duration-200 hover:bg-primary-dark text-accent text-lg font-semibold py-3 rounded-bigfi disabled:opacity-60"
+                      onClick={handleStake}
+                      disabled={!amount || Number(amount) <= 0 || !userAddress || !!txStatus || stakingLoading}
                     >
-                      {txStatus ? txStatus : "Deposit"}
+                      {txStatus ? txStatus : stakingLoading ? "Loading..." : "Stake"}
                     </button>
                   </>
                 ) : (
@@ -440,26 +433,45 @@ export default function LaunchApp() {
                         placeholder="0.00"
                         className="flex-1 bg-transparent outline-none text-lg text-primary placeholder-secondary"
                       />
-                      <button className="mx-2 text-accent font-bold text-sm">MAX</button>
+                      <button 
+                        className="mx-2 text-accent font-bold text-sm hover:opacity-80"
+                        onClick={setMaxUnstake}
+                      >
+                        MAX
+                      </button>
                       <span className="flex items-center gap-1 text-secondary font-semibold">
                         <img src={selectedToken.avatar} alt="" className="w-6 h-6 inline-block rounded-full mr-1" />
                         {selectedToken.symbol}
                       </span>
                     </div>
-                    <div className="mb-1 text-xs text-secondary">1 {selectedToken.symbol} ≈ {withdrawRate} {selectedToken.vaultToken}</div>
-                    <div className="mb-1 text-secondary text-sm">Available balance: <span className="text-primary font-medium">{availableToWithdraw}.{selectedToken.vaultToken}</span></div>
-                    <div className="mb-2 text-sm text-secondary">CA: <span className="text-primary font-bold">{selectedToken.address}</span></div>
-                    <button className="flex w-1/4 mx-auto justify-center mt-4 border border-gray-600 bg-primary transition-colors duration-200 hover:bg-primary-dark text-accent text-lg font-semibold py-3 rounded-bigfi disabled:opacity-60"
-                      onClick={handleWithdraw}
-                      disabled={!userAddress || !!txStatus}
+                    <div className="mb-1 text-secondary text-sm">Available to unstake: <span className="text-primary font-medium">{getUserStakedAmount()} {selectedToken.symbol}</span></div>
+                    {/* <div className="mb-2 text-sm text-secondary">Rewards available: <span className="text-accent font-semibold">{getUserReward()} {selectedToken.symbol}</span></div> */}
+                    <button 
+                      className="flex w-1/4 mx-auto justify-center mt-4 border border-gray-600 bg-primary transition-colors duration-200 hover:bg-primary-dark text-accent text-lg font-semibold py-3 rounded-bigfi disabled:opacity-60"
+                      onClick={handleUnstake}
+                      disabled={!withdrawAmount || Number(withdrawAmount) <= 0 || !userAddress || !!txStatus || stakingLoading}
                     >
-                      {txStatus ? txStatus : "Queue Withdraw"}
+                      {txStatus ? txStatus : stakingLoading ? "Loading..." : "Unstake"}
                     </button>
                   </>
+                )}
+
+                {/* Error Display */}
+                {stakingError && (
+                  <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm">
+                    {stakingError}
+                  </div>
                 )}
               </div>
             </div>
           </div>
+
+          {/* Staking Info Section - Only show when user is connected */}
+          {userAddress && (
+            <div className="mt-8">
+              <StakingInfo stakingData={stakingData} loading={stakingLoading} />
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 
-export function useSepoliaWallet() {
+export function useArbitrumWallet() {
   const [address, setAddress] = useState<string | null>(null);
   const [provider, setProvider] = useState<ethers.BrowserProvider | null>(null);
   const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
@@ -13,37 +13,8 @@ export function useSepoliaWallet() {
     setIsClient(true);
   }, []);
 
-  // Original connect logic (for mainnet/future use)
-  /*
-  const connect = async () => {
-    if (!(window as any).ethereum) {
-      setError("MetaMask not found");
-      return;
-    }
-    try {
-      const ethProvider = new ethers.BrowserProvider((window as any).ethereum);
-      const network = await ethProvider.getNetwork();
-      if (network.chainId !== BigInt("11155111")) { // Sepolia chainId
-        // Prompt user to switch to Sepolia
-        await (window as any).ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0xaa36a7" }],
-        });
-      }
-      await ethProvider.send("eth_requestAccounts", []);
-      const signer = await ethProvider.getSigner();
-      setProvider(ethProvider);
-      setSigner(signer);
-      setAddress(await signer.getAddress());
-      setError(null);
-    } catch (e: any) {
-      setError(e.message || "Failed to connect");
-    }
-  };
-  */
-
-  // New connect logic for Sepolia (re-creates provider/signer after network switch)
-  const connectSepolia = async () => {
+  // Connect logic for Arbitrum mainnet
+  const connectArbitrum = async () => {
     if (!isClient) {
       setError("Not on client side");
       return;
@@ -55,17 +26,17 @@ export function useSepoliaWallet() {
     try {
       let ethProvider = new ethers.BrowserProvider((window as any).ethereum);
       let network = await ethProvider.getNetwork();
-      if (network.chainId !== BigInt("11155111")) { // Sepolia chainId
-        // Prompt user to switch to Sepolia
+      if (network.chainId !== BigInt("42161")) { // Arbitrum mainnet chainId
+        // Prompt user to switch to Arbitrum
         await (window as any).ethereum.request({
           method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0xaa36a7" }],
+          params: [{ chainId: "0xa4b1" }],
         });
         // After switching, re-create provider and get new network
         ethProvider = new ethers.BrowserProvider((window as any).ethereum);
         network = await ethProvider.getNetwork();
-        if (network.chainId !== BigInt("11155111")) {
-          setError("Failed to switch to Sepolia");
+        if (network.chainId !== BigInt("42161")) {
+          setError("Failed to switch to Arbitrum");
           return;
         }
       }
@@ -87,6 +58,5 @@ export function useSepoliaWallet() {
     setError(null);
   };
 
-  // Export both connect (for mainnet/future) and connectSepolia (for Sepolia dev)
-  return { address, provider, signer, error, connectSepolia, disconnect, isClient };
+  return { address, provider, signer, error, connectArbitrum, disconnect, isClient };
 } 
