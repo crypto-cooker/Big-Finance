@@ -103,10 +103,11 @@ export function useStaking(provider: ethers.BrowserProvider | null, signer: ethe
     
     const parsedAmount = ethers.parseUnits(amount, 6);
     
-    // Check allowance and approve if needed
+    // Check allowance and approve max amount if needed
     const allowance = await usdcContract.allowance(address, ADDRESSES.STAKING);
     if (allowance < parsedAmount) {
-      const approveTx = await usdcContract.approve(ADDRESSES.STAKING, parsedAmount);
+      const maxAmount = ethers.MaxUint256;
+      const approveTx = await usdcContract.approve(ADDRESSES.STAKING, maxAmount);
       await approveTx.wait();
     }
     
@@ -127,10 +128,11 @@ export function useStaking(provider: ethers.BrowserProvider | null, signer: ethe
     
     const parsedAmount = ethers.parseUnits(amount, 8);
     
-    // Check allowance and approve if needed
+    // Check allowance and approve max amount if needed
     const allowance = await wbtcContract.allowance(address, ADDRESSES.STAKING);
     if (allowance < parsedAmount) {
-      const approveTx = await wbtcContract.approve(ADDRESSES.STAKING, parsedAmount);
+      const maxAmount = ethers.MaxUint256;
+      const approveTx = await wbtcContract.approve(ADDRESSES.STAKING, maxAmount);
       await approveTx.wait();
     }
     
