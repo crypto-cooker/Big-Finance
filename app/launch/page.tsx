@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import ThemeToggle from '../components/ThemeToggle';
+
 import { ethers } from 'ethers';
 import { useArbitrumWallet } from "../hooks/useArbitrumWallet";
 import { useStaking } from "../hooks/useStaking";
@@ -290,7 +290,6 @@ export default function LaunchApp() {
                 </div>
               )}
               {error && <span className="text-red-500 text-xs ml-2">{error}</span>}
-              <ThemeToggle />
             </div>
           </div>
         </div>

@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import AnimatedBackground from '../components/AnimatedBackground';
-import ThemeToggle from '../components/ThemeToggle';
 
 export default function HowItWorks() {
   return (
@@ -30,7 +29,6 @@ export default function HowItWorks() {
               <Link href="/launch" className="gradient-bg text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition-all duration-200 shadow-lg">
                 Launch App
               </Link>
-              <ThemeToggle />
             </div>
           </div>
         </div>

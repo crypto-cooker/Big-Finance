@@ -9,12 +9,12 @@ import '@rainbow-me/rainbowkit/styles.css';
 
 const queryClient = new QueryClient();
 
-// Theme context for dark/light mode
+// Theme context for dark mode only
 const ThemeContext = createContext<{
-  theme: 'light' | 'dark',
+  theme: 'dark',
   toggleTheme: () => void
 }>({
-  theme: 'light',
+  theme: 'dark',
   toggleTheme: () => {},
 });
 
@@ -23,29 +23,23 @@ export function useTheme() {
 }
 
 function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark';
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
   }, []);
 
   useEffect(() => {
     if (isClient) {
-      document.documentElement.classList.remove('light', 'dark');
-      document.documentElement.classList.add(theme);
-      localStorage.setItem('theme', theme);
+      document.documentElement.classList.remove('light');
+      document.documentElement.classList.add('dark');
     }
-  }, [theme, isClient]);
+  }, [isClient]);
 
-  const toggleTheme = () => setTheme(t => (t === 'light' ? 'dark' : 'light'));
+  const toggleTheme = () => {}; // No-op since we only support dark theme
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme: 'dark', toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

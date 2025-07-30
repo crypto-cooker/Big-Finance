@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ethers } from 'ethers';
-import ThemeToggle from './components/ThemeToggle';
 import AnimatedBackground from './components/AnimatedBackground';
 
 // Contract addresses (Sepolia)
@@ -199,7 +198,6 @@ export default function Home() {
               <Link href="/launch" className="gradient-bg text-white px-6 py-2 rounded-lg font-semibold hover:opacity-90 transition-all duration-200 shadow-lg">
                 Launch App
               </Link>
-              <ThemeToggle />
             </div>
           </div>
         </div>
