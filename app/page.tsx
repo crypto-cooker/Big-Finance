@@ -165,7 +165,6 @@ export default function Home() {
     // ✅ FIXED: Add periodic refresh every 30 seconds
     const interval = setInterval(fetchStats, 30000);
 
-    // Cleanup listener and interval on component unmount
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       clearInterval(interval);
