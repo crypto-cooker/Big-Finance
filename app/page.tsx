@@ -162,7 +162,6 @@ export default function Home() {
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // ✅ FIXED: Add periodic refresh every 30 seconds
     const interval = setInterval(fetchStats, 30000);
 
     return () => {
