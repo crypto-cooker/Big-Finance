@@ -6,7 +6,7 @@ import AnimatedBackground from '../components/AnimatedBackground';
 export default function Transparency() {
   return (
     <div className="min-h-screen bg-primary text-primary transition-colors duration-500 relative overflow-hidden">
-      <AnimatedBackground />
+      {/* <AnimatedBackground /> */}
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-md border-b border-primary transition-colors duration-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
