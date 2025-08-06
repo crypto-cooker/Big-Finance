@@ -20,7 +20,7 @@ export function useArbitrumWallet() {
       setError("Not on client side");
       return;
     }
-    if (!(window as any).ethereum) {
+    if (!(window as typeof window & { ethereum?: unknown }).ethereum) {
       setError("MetaMask not found");
       return;
     }
@@ -29,17 +29,25 @@ export function useArbitrumWallet() {
     setError(null);
 
     try {
-      let ethProvider = new ethers.BrowserProvider((window as any).ethereum);
+      let ethProvider = new ethers.BrowserProvider(
+        (window as typeof window & { ethereum: unknown }).ethereum
+      );
       let network = await ethProvider.getNetwork();
       if (network.chainId !== BigInt("42161")) {
         // Arbitrum mainnet chainId
         // Prompt user to switch to Arbitrum
-        await (window as any).ethereum.request({
+        await (
+          window as typeof window & {
+            ethereum: { request: (params: unknown) => Promise<unknown> };
+          }
+        ).ethereum.request({
           method: "wallet_switchEthereumChain",
           params: [{ chainId: "0xa4b1" }],
         });
         // After switching, re-create provider and get new network
-        ethProvider = new ethers.BrowserProvider((window as any).ethereum);
+        ethProvider = new ethers.BrowserProvider(
+          (window as typeof window & { ethereum: unknown }).ethereum
+        );
         network = await ethProvider.getNetwork();
         if (network.chainId !== BigInt("42161")) {
           setError("Failed to switch to Arbitrum");
@@ -52,8 +60,9 @@ export function useArbitrumWallet() {
       setSigner(signer);
       setAddress(await signer.getAddress());
       setError(null);
-    } catch (e: any) {
-      setError(e.message || "Failed to connect");
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : "Failed to connect";
+      setError(errorMessage);
     } finally {
       setIsConnecting(false);
     }

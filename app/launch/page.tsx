@@ -276,10 +276,10 @@ export default function LaunchApp() {
       setTxStatus("Stake successful!");
       setAmount("");
       await fetchAllTokenStats();
-    } catch (e: any) {
-      let msg = e?.message || e;
+    } catch (e: unknown) {
+      let msg = e instanceof Error ? e.message : String(e);
       if (
-        e?.code === 4001 ||
+        (e as { code?: number })?.code === 4001 ||
         msg.toLowerCase().includes("user rejected") ||
         msg.toLowerCase().includes("user denied")
       ) {
@@ -335,10 +335,10 @@ export default function LaunchApp() {
       setTxStatus("Unstake successful!");
       setWithdrawAmount("");
       await fetchAllTokenStats();
-    } catch (e: any) {
-      let msg = e?.message || e;
+    } catch (e: unknown) {
+      let msg = e instanceof Error ? e.message : String(e);
       if (
-        e?.code === 4001 ||
+        (e as { code?: number })?.code === 4001 ||
         msg.toLowerCase().includes("user rejected") ||
         msg.toLowerCase().includes("user denied")
       ) {
@@ -367,7 +367,7 @@ export default function LaunchApp() {
       fetchAllTokenStats();
     }, 30000); // Refresh every 30 seconds
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchAllTokenStats]);
 
   // Close dropdown when clicking outside
   useEffect(() => {

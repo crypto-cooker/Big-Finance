@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 
 const ANIMATION_DURATION = 1800; // ms
 const LOOP_INTERVAL = 3000; // ms
@@ -9,10 +9,8 @@ export default function MeteorAnimation() {
   const requestRef = useRef<number>(0);
   const startTimeRef = useRef<number>(0);
   const [loop, setLoop] = React.useState(0);
-  const [showDrop, setShowDrop] = React.useState(true);
 
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
     let running = true;
     function animateMeteor(time: number) {
       if (!startTimeRef.current) startTimeRef.current = time;
@@ -23,31 +21,37 @@ export default function MeteorAnimation() {
       const control = { x: 280, y: 300 };
       const end = { x: 0, y: 600 };
       // Quadratic Bezier
-      const x = (1 - t) * (1 - t) * start.x + 2 * (1 - t) * t * control.x + t * t * end.x;
-      const y = (1 - t) * (1 - t) * start.y + 2 * (1 - t) * t * control.y + t * t * end.y;
+      const x =
+        (1 - t) * (1 - t) * start.x +
+        2 * (1 - t) * t * control.x +
+        t * t * end.x;
+      const y =
+        (1 - t) * (1 - t) * start.y +
+        2 * (1 - t) * t * control.y +
+        t * t * end.y;
       // Meteor color pulse
       const colorPulse = 0.5 + 0.5 * Math.sin(8 * Math.PI * t);
       if (ballRef.current) {
-        ballRef.current.setAttribute('cx', String(x));
-        ballRef.current.setAttribute('cy', String(y));
-        ballRef.current.setAttribute('opacity', t < 0.98 ? '1' : '0');
-        ballRef.current.setAttribute('r', String(16 + 8 * colorPulse));
-        ballRef.current.setAttribute('filter', 'url(#meteor-glow-filter)');
+        ballRef.current.setAttribute("cx", String(x));
+        ballRef.current.setAttribute("cy", String(y));
+        ballRef.current.setAttribute("opacity", t < 0.98 ? "1" : "0");
+        ballRef.current.setAttribute("r", String(16 + 8 * colorPulse));
+        ballRef.current.setAttribute("filter", "url(#meteor-glow-filter)");
       }
       // Drop-in flash: only show at t ~ 0
       if (dropRef.current) {
-        const dropOpacity = t < 0.12 ? (1 - t / 0.12) : 0;
-        dropRef.current.setAttribute('opacity', String(dropOpacity));
-        dropRef.current.setAttribute('r', String(18 + 18 * colorPulse));
+        const dropOpacity = t < 0.12 ? 1 - t / 0.12 : 0;
+        dropRef.current.setAttribute("opacity", String(dropOpacity));
+        dropRef.current.setAttribute("r", String(18 + 18 * colorPulse));
       }
       if (t < 1 && running) {
         requestRef.current = requestAnimationFrame(animateMeteor);
       }
     }
     requestRef.current = requestAnimationFrame(animateMeteor);
-    timeout = setTimeout(() => {
+    const timeout = setTimeout(() => {
       startTimeRef.current = 0;
-      setLoop(l => l + 1);
+      setLoop((l) => l + 1);
     }, LOOP_INTERVAL);
     return () => {
       running = false;
@@ -63,12 +67,12 @@ export default function MeteorAnimation() {
       height="100vh"
       viewBox="0 0 400 600"
       style={{
-        position: 'fixed',
+        position: "fixed",
         top: 0,
         left: 0,
-        width: '100vw',
-        height: '100vh',
-        pointerEvents: 'none',
+        width: "100vw",
+        height: "100vh",
+        pointerEvents: "none",
         zIndex: 0,
       }}
     >
@@ -85,7 +89,13 @@ export default function MeteorAnimation() {
           <stop offset="60%" stopColor="#fff" stopOpacity="0.7" />
           <stop offset="100%" stopColor="#1CA7EC" stopOpacity="0.1" />
         </radialGradient>
-        <filter id="meteor-glow-filter" x="-50%" y="-50%" width="200%" height="200%">
+        <filter
+          id="meteor-glow-filter"
+          x="-50%"
+          y="-50%"
+          width="200%"
+          height="200%"
+        >
           <feGaussianBlur stdDeviation="8" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
@@ -113,4 +123,4 @@ export default function MeteorAnimation() {
       />
     </svg>
   );
-} 
+}

@@ -1,20 +1,19 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 export default function Animation() {
-    const canvasRef = useRef<HTMLCanvasElement>(null);
-
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    console.log('Animation');
+    console.log("Animation");
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const colors = ['#2775ca', '#4856fc', '#5e8df5', '#f7931a'];
+    const colors = ["#2775ca", "#4856fc", "#5e8df5", "#f7931a"];
     const LINE_WIDTH = 3;
     const MAX_TOTAL_LINES = 6;
     const MAX_VERTICAL = 3;
@@ -22,7 +21,16 @@ export default function Animation() {
 
     let width = 0;
     let height = 0;
-    const lines: any[] = [];
+    const lines: Array<{
+      vertical: boolean;
+      direction: number;
+      position: number;
+      progress: number;
+      speed: number;
+      length: number;
+      color: string;
+      width: number;
+    }> = [];
 
     function resize() {
       if (!canvas) return;
@@ -31,7 +39,7 @@ export default function Animation() {
     }
 
     resize();
-    window.addEventListener('resize', resize);
+    window.addEventListener("resize", resize);
 
     function countLines() {
       let verticalCount = 0;
@@ -56,7 +64,9 @@ export default function Animation() {
       else vertical = Math.random() < 0.5;
 
       const direction = Math.random() < 0.5 ? 1 : -1;
-      const position = vertical ? Math.random() * width : Math.random() * height;
+      const position = vertical
+        ? Math.random() * width
+        : Math.random() * height;
       const speed = (1.5 + Math.random() * 2.5) * 0.5;
       const length = 60 + Math.random() * 120;
       const color = randomFromArray(colors);
@@ -105,7 +115,7 @@ export default function Animation() {
           );
         }
         grad.addColorStop(0, l.color);
-        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        grad.addColorStop(1, "rgba(255,255,255,0)");
 
         ctx.strokeStyle = grad;
         ctx.lineWidth = l.width;
@@ -172,7 +182,7 @@ export default function Animation() {
     draw();
 
     return () => {
-      window.removeEventListener('resize', resize);
+      window.removeEventListener("resize", resize);
     };
   }, []);
 
@@ -180,13 +190,13 @@ export default function Animation() {
     <canvas
       ref={canvasRef}
       style={{
-        position: 'fixed',
+        position: "fixed",
         top: 0,
         left: 0,
-        width: '100%',
-        height: '100%',
-        zIndex:10,
-        pointerEvents: 'none',
+        width: "100%",
+        height: "100%",
+        zIndex: 10,
+        pointerEvents: "none",
         // zIndex: -1,
       }}
     />
