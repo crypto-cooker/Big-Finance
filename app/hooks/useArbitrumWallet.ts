@@ -7,6 +7,7 @@ export function useArbitrumWallet() {
   const [signer, setSigner] = useState<ethers.JsonRpcSigner | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
 
   // Ensure we're on the client side
   useEffect(() => {
@@ -23,10 +24,15 @@ export function useArbitrumWallet() {
       setError("MetaMask not found");
       return;
     }
+
+    setIsConnecting(true);
+    setError(null);
+
     try {
       let ethProvider = new ethers.BrowserProvider((window as any).ethereum);
       let network = await ethProvider.getNetwork();
-      if (network.chainId !== BigInt("42161")) { // Arbitrum mainnet chainId
+      if (network.chainId !== BigInt("42161")) {
+        // Arbitrum mainnet chainId
         // Prompt user to switch to Arbitrum
         await (window as any).ethereum.request({
           method: "wallet_switchEthereumChain",
@@ -48,6 +54,8 @@ export function useArbitrumWallet() {
       setError(null);
     } catch (e: any) {
       setError(e.message || "Failed to connect");
+    } finally {
+      setIsConnecting(false);
     }
   };
 
@@ -58,5 +66,14 @@ export function useArbitrumWallet() {
     setError(null);
   };
 
-  return { address, provider, signer, error, connectArbitrum, disconnect, isClient };
-} 
+  return {
+    address,
+    provider,
+    signer,
+    error,
+    isConnecting,
+    connectArbitrum,
+    disconnect,
+    isClient,
+  };
+}
