@@ -10,15 +10,13 @@ interface TransparencyImageProps {
   alt: string;
   className?: string;
   priority?: boolean;
-  fallback?: string;
 }
 
 export const TransparencyImage: React.FC<TransparencyImageProps> = ({
   src,
   alt,
   className = '',
-  priority = false,
-  fallback = '/images/placeholder.png'
+  priority = false
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);

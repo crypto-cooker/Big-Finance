@@ -6,6 +6,7 @@ import { useTheme } from "../components/ThemeProvider";
 import { ThemeToggle } from "../components/ThemeToggle";
 import { TransparencyImage } from "../components/TransparencyImage";
 import { LoadingLink } from "../components/LoadingLink";
+import { MobileNavigation } from "../components/MobileNavigation";
 
 export default function Transparency() {
   const { theme } = useTheme();
@@ -36,14 +37,14 @@ export default function Transparency() {
             <div className="hidden md:flex items-center space-x-8">
               <LoadingLink
                 href="/how-it-works"
-                className="text-accent hover:text-accent2 transition-colors"
+                className="text-accent hover:text-accent transition-colors"
                 variant="nav"
               >
                 How it works
               </LoadingLink>
               <LoadingLink
                 href="/transparency"
-                className="text-accent hover:text-accent2 transition-colors"
+                className="text-accent hover:text-accent transition-colors"
                 variant="nav"
               >
                 Transparency
@@ -57,6 +58,7 @@ export default function Transparency() {
               </LoadingLink>
               <ThemeToggle />
             </div>
+            <MobileNavigation currentPage="/transparency" />
           </div>
         </div>
       </nav>
@@ -64,7 +66,7 @@ export default function Transparency() {
       <div className="pt-32 pb-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h1 className="h-[100px] text-7xl font-bold  gradient-text">
+            <h1 className="h-[100px] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold gradient-text">
               Transparency
             </h1>
             <p className="text-xl  text-secondary">
@@ -215,7 +217,7 @@ export default function Transparency() {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <h2 className="text-2xl font-bold mb-4 text-accent2">
+                        <h2 className="text-2xl font-bold mb-4 text-accent">
                           Real-Time Analytics
                         </h2>
                         <p className="text-secondary mb-4">
@@ -226,7 +228,7 @@ export default function Transparency() {
                     </div>
                     <div className="grid grid-cols-1 gap-4 mt-6">
                       <div className="bg-accent2/10 rounded-lg p-4 border border-accent2/30">
-                        <h3 className="font-bold text-accent2 mb-2">
+                        <h3 className="font-bold text-accent mb-2">
                           Total Value Locked
                         </h3>
                         <p className="text-2xl font-bold gradient-text">
@@ -234,7 +236,7 @@ export default function Transparency() {
                         </p>
                       </div>
                       <div className="bg-accent2/10 rounded-lg p-4 border border-accent2/30">
-                        <h3 className="font-bold text-accent2 mb-2">
+                        <h3 className="font-bold text-accent mb-2">
                           Active Users
                         </h3>
                         <p className="text-2xl font-bold gradient-text">
@@ -242,7 +244,7 @@ export default function Transparency() {
                         </p>
                       </div>
                       <div className="bg-accent2/10 rounded-lg p-4 border border-accent2/30">
-                        <h3 className="font-bold text-accent2 mb-2">
+                        <h3 className="font-bold text-accent mb-2">
                           Total Rewards
                         </h3>
                         <p className="text-2xl font-bold gradient-text">
@@ -391,7 +393,7 @@ export default function Transparency() {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <h2 className="text-2xl font-bold mb-4 text-accent2">
+                        <h2 className="text-2xl font-bold mb-4 text-accent">
                           Open Source
                         </h2>
                         <p className="text-secondary mb-4">
@@ -402,7 +404,7 @@ export default function Transparency() {
                       </div>
                     </div>
                     <div className="bg-accent2/10 rounded-lg p-4 border border-accent2/30 mt-6">
-                      <p className="text-accent2 text-sm">
+                      <p className="text-accent text-sm">
                         <strong>Repository:</strong> All code available on
                         GitHub for public review and audit
                       </p>

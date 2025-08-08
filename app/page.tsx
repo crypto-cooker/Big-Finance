@@ -6,6 +6,7 @@ import { ethers } from "ethers";
 import BackgroundSelector from "./components/BackgroundSelector";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { LoadingLink } from "./components/LoadingLink";
+import { MobileNavigation } from "./components/MobileNavigation";
 
 // Contract addresses (Sepolia)
 const CONTRACT_ADDRESSES = {
@@ -264,6 +265,7 @@ export default function Home() {
               </LoadingLink>
               <ThemeToggle />
             </div>
+            <MobileNavigation currentPage="/" />
           </div>
         </div>
       </nav>
@@ -278,26 +280,26 @@ export default function Home() {
               </span>
               <span className="text-accent">✨</span>
             </div>
-            <h1 className="text-7xl md:text-7xl font-bold mb-3 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-3 leading-tight">
               Yield Made
               <br />
               <span className="gradient-text">Extraordinary</span>
             </h1>
-            <p className="text-xl text-secondary max-w-2xl mx-auto mb-8 leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl text-secondary max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed px-4">
               Experience the next generation of DeFi with institutional-grade
               strategies accessible to everyone.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
               <LoadingLink
                 href="/launch"
-                className="gradient-bg text-white px-8 py-4 rounded-lg font-semibold text-lg hover:opacity-90 transition-all duration-200 shadow-lg"
+                className="gradient-bg text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:opacity-90 transition-all duration-200 shadow-lg"
                 variant="button"
               >
                 Launch App
               </LoadingLink>
               <LoadingLink
                 href="/how-it-works"
-                className="border border-accent/50 text-accent px-8 py-4 rounded-lg font-semibold text-lg hover:bg-accent/10 transition-all duration-200"
+                className="border border-accent/50 text-accent px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-accent/10 transition-all duration-200"
                 variant="button"
               >
                 Learn More
@@ -310,24 +312,24 @@ export default function Home() {
       {/* TVL Section */}
       <section className="pt-5 pb-20 relative bg-panel transition-colors duration-500 overflow-hidden">
         <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-5">
-            <h2 className="text-2xl font-semibold mb-4 text-accent">
+          <div className="text-center mb-5 px-4">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4 text-accent">
               Total Value Locked
             </h2>
-            <div className="text-5xl font-bold gradient-text mb-4">
+            <div className="text-3xl sm:text-4xl md:text-5xl font-bold gradient-text mb-3 sm:mb-4">
               {/* ✅ FIXED: Show loading state */}
               {isLoading ? (
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
+                <div className="inline-block animate-spin rounded-full h-8 sm:h-12 w-8 sm:w-12 border-b-2 border-accent"></div>
               ) : (
                 `$${totalTVL}`
               )}
             </div>
-            <div className="text-secondary text-lg">
+            <div className="text-secondary text-base sm:text-lg">
               Securing the future of decentralized finance
             </div>
           </div>
           {/* Token Card */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 ">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 px-4">
             {TOKENS.map((token, index) => (
               <div
                 key={token.symbol}
@@ -341,20 +343,20 @@ export default function Home() {
                     : "card-usdc"
                 }`}
               >
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                   <img
                     src={token.avatar}
                     alt={token.name}
-                    className="w-10 h-10 rounded-full transition-all duration-500 ease-out hover:scale-125 hover:rotate-6 transform-gpu"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-all duration-500 ease-out hover:scale-125 hover:rotate-6 transform-gpu"
                   />
                   <div>
-                    <div className="text-4xl font-bold text-accent transition-all duration-500 ease-out hover:scale-105 transform-gpu">
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-accent transition-all duration-500 ease-out hover:scale-105 transform-gpu">
                       {token.symbol}
                     </div>
                     {/* <div className="text-accent2 text-sm">{token.name}</div> */}
                   </div>
                   <div
-                    className={`ml-auto rounded-full px-4 h-10 grid place-items-center transition-all duration-500 ease-out hover:scale-110 hover:shadow-lg transform-gpu ${
+                    className={`ml-auto rounded-full px-2 sm:px-4 h-8 sm:h-10 grid place-items-center transition-all duration-500 ease-out hover:scale-110 hover:shadow-lg transform-gpu text-xs sm:text-sm ${
                       token.symbol === "BTC"
                         ? "btc-style"
                         : token.symbol === "ETH"
@@ -372,11 +374,11 @@ export default function Home() {
                     {/* ✅ FIXED: Better formatting and loading state */}
                     Locked Value
                   </p>
-                  <div className="text-3xl text-accent2 mb-1 transition-all duration-500 ease-out transform-gpu">
+                  <div className="text-xl sm:text-2xl md:text-3xl text-accent2 mb-1 transition-all duration-500 ease-out transform-gpu">
                     {isLoading
                       ? "---"
                       : `${tokenStats[index].locked.toLocaleString()} `}{" "}
-                    <span className="font-light text-slate-500 text-base">
+                    <span className="font-light text-slate-500 text-sm sm:text-base">
                       {token.symbol}
                     </span>
                   </div>
@@ -399,21 +401,21 @@ export default function Home() {
       {/* Problem Section */}
       <section className="py-20 bg-panel/90 relative">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-accent">
+          <div className="text-center mb-12 sm:mb-16 px-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 text-accent">
               Problem: DeFi Limitations
             </h2>
-            <p className="text-xl text-secondary max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-secondary max-w-3xl mx-auto">
               Traditional DeFi solutions face critical challenges that limit
               growth and accessibility for everyday users.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 px-4">
             {PROBLEMS.map((problem, index) => (
               <div
                 key={index}
-                className="bg-card transition-colors duration-500 rounded-lg p-6 border border-primary text-center group"
+                className="bg-card transition-colors duration-500 rounded-lg p-4 sm:p-6 border border-primary text-center group"
               >
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto border border-red-500/30 group-hover:bg-red-500/30 transition-colors">
                   {/* Unique abstract SVGs for each card */}
@@ -513,7 +515,7 @@ export default function Home() {
                     </svg>
                   )}
                 </div>
-                <div className="text-lg font-semibold text-red-300">
+                <div className="text-sm sm:text-base md:text-lg font-semibold text-red-300">
                   - {problem.title}
                 </div>
               </div>
@@ -525,21 +527,21 @@ export default function Home() {
       {/* Solution Section */}
       <section className="py-20 bg-panel relative transition-colors duration-500">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-accent">
+          <div className="text-center mb-12 sm:mb-16 px-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 text-accent">
               Our Solution
             </h2>
-            <p className="text-xl text-secondary max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-secondary max-w-3xl mx-auto">
               Big FI bridges the gap between TradFi and DeFi, offering better
               yields and more accessible products.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 px-4">
             {SOLUTIONS.map((solution, index) => (
               <div
                 key={index}
-                className="bg-card transition-colors duration-500 p-6 border border-primary text-center rounded-lg group"
+                className="bg-card transition-colors duration-500 p-4 sm:p-6 border border-primary text-center rounded-lg group"
               >
                 <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 mx-auto border border-primary group-hover:bg-primary/20 transition-colors">
                   {/* Unique abstract SVGs for each card */}
@@ -638,7 +640,7 @@ export default function Home() {
                     </svg>
                   )}
                 </div>
-                <div className="text-lg font-semibold text-primary">
+                <div className="text-sm sm:text-base md:text-lg font-semibold text-primary">
                   + {solution.title}
                 </div>
               </div>
@@ -650,31 +652,31 @@ export default function Home() {
       {/* Products Section */}
       <section className="py-20 relative">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-accent">
+          <div className="text-center mb-12 sm:mb-16 px-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 text-accent">
               Our Products
             </h2>
-            <p className="text-xl text-secondary max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-secondary max-w-3xl mx-auto">
               Revolutionary DeFi products designed for maximum capital
               efficiency and user experience.
             </p>
           </div>
 
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 sm:mb-12 px-4">
             <Link
               href="/launch"
-              className="gradient-bg text-white px-8 py-4 rounded-lg font-semibold text-lg hover:opacity-90 transition-all duration-200 shadow-lg"
+              className="gradient-bg text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:opacity-90 transition-all duration-200 shadow-lg"
             >
               Start Earning
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16 px-4">
             {TOKENS.map((token, index) => (
               <div
                 key={index}
                 onClick={() => setSelectedToken(token)}
-                className={`text-center bg-card/80 rounded-bigfi p-6 border transition-all duration-300 cursor-pointer ${
+                className={`text-center bg-card/80 rounded-bigfi p-4 sm:p-6 border transition-all duration-300 cursor-pointer ${
                   selectedToken.symbol === token.symbol
                     ? "border-accent2 bg-accent2/10 shadow-lg shadow-accent2/20 scale-105"
                     : "border-primary hover:border-accent2/40"
@@ -687,13 +689,13 @@ export default function Home() {
                     className="w-8 h-8 rounded-full transition-transform duration-200 hover:scale-110"
                   />
                 </div>
-                <div className="text-2xl font-bold mb-2 text-accent">
+                <div className="text-xl sm:text-2xl font-bold mb-2 text-accent">
                   {token.symbol}
                 </div>
-                <div className="text-3xl font-bold gradient-text mb-4">
+                <div className="text-2xl sm:text-3xl font-bold gradient-text mb-3 sm:mb-4">
                   {token.apy}% APY*
                 </div>
-                <div className="text-sm text-accent2">
+                <div className="text-xs sm:text-sm text-accent2">
                   {/* ✅ FIXED: Better display format */}
                   TVL:{" "}
                   {isLoading
@@ -707,41 +709,47 @@ export default function Home() {
           </div>
 
           {/* Dynamic Token Vault Info - Updates based on selected token */}
-          <div className="bg-card/80 rounded-bigfi p-8 border border-primary transition-colors duration-500 h-[600px] md:h-[350px]">
-            <div className="flex items-center gap-4 mb-6">
+          <div className="bg-card/80 rounded-bigfi p-4 sm:p-6 md:p-8 border border-primary transition-colors duration-500 h-[500px] sm:h-[500px] md:h-[350px] px-4">
+            <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
               <img
                 src={selectedToken.avatar}
                 alt={selectedToken.name}
-                className="w-12 h-12 rounded-full"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full"
               />
               <div>
-                <h3 className="text-2xl font-bold text-accent">
+                <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-accent">
                   {selectedToken.symbol} Premium Vault
                 </h3>
-                <div className="text-2xl font-bold gradient-text">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold gradient-text">
                   {selectedToken.apy}% APY*
                 </div>
               </div>
             </div>
-            <p className="text-secondary  h-[100px]">
+            <p className="text-secondary text-sm sm:text-base h-[130px] mb-[10px] sm:h-[100px]">
               {selectedToken.description}
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-card/80 rounded-bigfi p-4 hover:bg-card/90 transition-colors">
-                <div className="text-primary text-md mb-2">Return Profile</div>
-                <div className="font-semibold text-secondary">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+              <div className="bg-card/80 rounded-bigfi p-3 sm:p-4 hover:bg-card/90 transition-colors">
+                <div className="text-primary text-sm sm:text-md mb-1 sm:mb-2">
+                  Return Profile
+                </div>
+                <div className="font-semibold text-secondary text-xs sm:text-sm">
                   {selectedToken.returnType}
                 </div>
               </div>
-              <div className="bg-card/80 rounded-bigfi p-4 hover:bg-card/90 transition-colors">
-                <div className="text-primary text-md mb-2">Risk Assessment</div>
-                <div className="font-semibold text-secondary">
+              <div className="bg-card/80 rounded-bigfi p-3 sm:p-4 hover:bg-card/90 transition-colors">
+                <div className="text-primary text-sm sm:text-md mb-1 sm:mb-2">
+                  Risk Assessment
+                </div>
+                <div className="font-semibold text-secondary text-xs sm:text-sm">
                   {selectedToken.risks}
                 </div>
               </div>
-              <div className="bg-card/80 rounded-bigfi p-4 hover:bg-card/90 transition-colors">
-                <div className="text-primary text-md mb-2">Total Locked</div>
-                <div className="font-semibold text-secondary">
+              <div className="bg-card/80 rounded-bigfi p-3 sm:p-4 hover:bg-card/90 transition-colors">
+                <div className="text-primary text-sm sm:text-md mb-1 sm:mb-2">
+                  Total Locked
+                </div>
+                <div className="font-semibold text-secondary text-xs sm:text-sm">
                   {/* ✅ FIXED: Better loading state and formatting */}
                   {isLoading
                     ? "..."
@@ -760,20 +768,20 @@ export default function Home() {
       {/* Build Section */}
       <section className="py-20 bg-panel relative transition-colors duration-500">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold mb-6 text-accent">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6 text-accent px-4">
             Build the Future with Big FI
           </h2>
-          <p className="text-xl text-secondary max-w-3xl mx-auto mb-8">
+          <p className="text-base sm:text-lg md:text-xl text-secondary max-w-3xl mx-auto mb-6 sm:mb-8 px-4">
             Join our ecosystem of innovative DeFi products that bridge
             traditional finance with decentralized opportunities.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="gradient-bg text-white px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-all duration-200 shadow-lg">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-4">
+            <button className="gradient-bg text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:opacity-90 transition-all duration-200 shadow-lg">
               Contact Us
             </button>
             <Link
               href="/launch"
-              className="border border-white text-accent px-8 py-4 rounded-lg font-semibold hover:bg-primary/10 transition-all duration-200"
+              className="border border-white text-accent px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-primary/10 transition-all duration-200"
             >
               Launch App
             </Link>
@@ -782,7 +790,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="flex justify-between relative py-3 border-t border-primary bg-slate-900/100 px-[5%]">
+      <footer className="flex justify-between relative py-3 border-t border-primary bg-slate-900/100 px-4 sm:px-[5%]">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 flex items-center justify-center font-bold text-xl">
             <Link href="/">

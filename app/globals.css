@@ -679,6 +679,61 @@ textarea:focus {
   100% { width: 100%; }
 }
 
+/* Mobile Navigation Styles */
+.mobile-nav {
+  position: relative;
+}
+
+/* Mobile Navigation Background - Theme Aware */
+.mobile-nav-bg {
+  background-color: rgba(0, 0, 0, 0.05); /* Very subtle black background for dark mode */
+  transition: background-color 0.3s ease;
+}
+
+/* Light mode variant */
+.light-mode .mobile-nav-bg {
+  background-color: rgba(255, 255, 255, 0.05); /* Very subtle white background for light mode */
+}
+
+/* Ensure mobile menu backdrop works with theme */
+.mobile-nav .bg-black\/50 {
+  backdrop-filter: blur(4px);
+}
+
+/* Mobile menu animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* Hamburger animation */
+.hamburger-line {
+  transition: all 0.3s ease;
+}
+
+/* Mobile menu item hover effects */
+.mobile-nav .hover\:bg-accent\/10:hover {
+  background-color: rgba(28, 167, 236, 0.1);
+}
+
+/* Ensure mobile menu is above other elements */
+.mobile-nav .z-40 {
+  z-index: 40;
+}
+
 /* Smooth theme transitions */
 * {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;

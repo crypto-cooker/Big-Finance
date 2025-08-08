@@ -25,7 +25,7 @@ export const LoadingLink: React.FC<LoadingLinkProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleClick = async (e: React.MouseEvent) => {
+  const handleClick = async () => {
     if (onClick) {
       onClick();
     }

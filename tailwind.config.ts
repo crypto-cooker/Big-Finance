@@ -31,6 +31,9 @@ const config: Config = {
         "bigfi-btn-dark": "#174A6A", // button blue dark
         "bigfi-gray": "#A3B1C6", // muted text
         "bigfi-accent": "#00CFFF", // accent cyan
+        // Theme-aware accent colors that work with CSS variables
+        accent: "var(--color-accent)",
+        accent2: "var(--color-accent2)",
       },
       backgroundImage: {
         "bigfi-gradient": "linear-gradient(90deg, #1CA7EC 0%, #23D18B 100%)",

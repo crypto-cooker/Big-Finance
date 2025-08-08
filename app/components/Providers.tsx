@@ -21,7 +21,7 @@ function ClientProviders({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen bg-background text-primary flex items-center justify-center">
         <div className="relative">
-          <div className="inline-block animate-spin rounded-full h-24 w-24 border-b-2 border-accent"></div>
+          <div className="inline-block animate-spin rounded-full h-24 w-24 border-b-2 border-blue-500"></div>
           <div className="absolute inset-0 flex items-center justify-center">
             <img src="/logo.png" alt="Logo" className="w-12 h-12" />
           </div>

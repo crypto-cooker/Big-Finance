@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
+import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 
 interface OptimizedImageProps {
   src: string;
@@ -18,9 +18,9 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   alt,
   width = 40,
   height = 40,
-  className = '',
+  className = "",
   priority = false,
-  fallback = '/images/placeholder.png'
+  fallback = "/images/placeholder.png",
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -61,18 +61,20 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       {isLoading && (
         <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 animate-pulse rounded-full" />
       )}
-      
+
       {isInView && (
         <Image
           src={imageSrc}
           alt={alt}
           width={width}
           height={height}
-          className={`transition-opacity duration-300 ${isLoading ? 'opacity-0' : 'opacity-100'} ${className}`}
+          className={`transition-opacity duration-300 ${
+            isLoading ? "opacity-0" : "opacity-100"
+          } ${className}`}
           onLoad={handleLoad}
           onError={handleError}
           priority={priority}
-          loading={priority ? 'eager' : 'lazy'}
+          loading={priority ? "eager" : "lazy"}
         />
       )}
     </div>
@@ -83,15 +85,31 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
 export const TokenAvatar: React.FC<{
   symbol: string;
   src: string;
-  size?: 'sm' | 'md' | 'lg';
-}> = ({ symbol, src, size = 'md' }) => {
+  size?: "sm" | "md" | "lg";
+}> = ({ symbol, src, size = "md" }) => {
   const sizeMap = {
     sm: { width: 24, height: 24 },
     md: { width: 40, height: 40 },
-    lg: { width: 64, height: 64 }
+    lg: { width: 64, height: 64 },
   };
 
   const { width, height } = sizeMap[size];
+
+  // Create responsive className for different screen sizes
+  const getResponsiveClassName = () => {
+    const baseClass = "rounded-full";
+
+    // For screens smaller than sm, use 30x30px (w-7 h-7)
+    // For sm and larger, use the original size
+    const responsiveClass =
+      size === "sm"
+        ? "w-7 h-7 sm:w-6 sm:h-6" // 30px on mobile, 24px on sm+
+        : size === "md"
+        ? "w-7 h-7 sm:w-10 sm:h-10" // 30px on mobile, 40px on sm+
+        : "w-7 h-7 sm:w-16 sm:h-16"; // 30px on mobile, 64px on sm+
+
+    return `${baseClass} ${responsiveClass}`;
+  };
 
   return (
     <OptimizedImage
@@ -99,7 +117,7 @@ export const TokenAvatar: React.FC<{
       alt={`${symbol} token`}
       width={width}
       height={height}
-      className="rounded-full"
+      className={getResponsiveClassName()}
       fallback={`/images/${symbol.toLowerCase()}.png`}
     />
   );
@@ -110,7 +128,7 @@ export const LazyComponent: React.FC<{
   children: React.ReactNode;
   threshold?: number;
   className?: string;
-}> = ({ children, threshold = 0.1, className = '' }) => {
+}> = ({ children, threshold = 0.1, className = "" }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -134,9 +152,11 @@ export const LazyComponent: React.FC<{
 
   return (
     <div ref={ref} className={className}>
-      {isVisible ? children : (
+      {isVisible ? (
+        children
+      ) : (
         <div className="w-full h-32 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 animate-pulse rounded-lg" />
       )}
     </div>
   );
-}; 
+};

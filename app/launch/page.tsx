@@ -25,6 +25,7 @@ import {
 } from "../components/MicroInteractions";
 import { TokenAvatar, LazyComponent } from "../components/OptimizedImage";
 import { LoadingLink } from "../components/LoadingLink";
+import { MobileNavigation } from "../components/MobileNavigation";
 
 // Remove the inline useTheme hook since we're now importing it
 
@@ -425,7 +426,7 @@ export default function LaunchApp() {
                 {!userAddress ? (
                   <button
                     onClick={connectArbitrum}
-                    className=" text-accent text-md font-bold uppercase bg-gradient-to-r from-accent to-accent2 px-4 py-2 rounded-lg shadow-lg border-b-2 border-t border-black border-opacity-20 hover:opacity-90 transition-all duration-200 text-sm"
+                    className=" text-accent text-md font-bold uppercase from-accent to-accent2 px-4 py-2 rounded-lg shadow-lg border-b-2 border-t border-black border-opacity-20 hover:opacity-90 transition-all duration-200 text-sm"
                   >
                     Connect Wallet
                   </button>
@@ -495,6 +496,14 @@ export default function LaunchApp() {
               </div>
               <ThemeToggle />
             </div>
+            <MobileNavigation
+              userAddress={userAddress}
+              connectArbitrum={connectArbitrum}
+              disconnect={disconnect}
+              isConnecting={isConnecting}
+              showWalletButton={true}
+              currentPage="/launch"
+            />
           </div>
         </div>
       </nav>
@@ -502,21 +511,51 @@ export default function LaunchApp() {
       <div className="pt-20 pb-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="text-center mb-12 pt-8">
+          <div className="text-center mb-4 pt-8">
             <div className="inline-flex items-center gap-2 bg-primary/20 backdrop-blur-sm rounded-full px-6 py-3 mb-8 border border-primary/30">
-              <span className="text-sm font-medium text-secondary">
+              <span className="text-xs sm:text-sm md:text-base font-medium text-secondary">
                 DeFi Yield Platform
               </span>
               <span className="text-accent">🚀</span>
             </div>
-            <h1 className="h-[100px] text-7xl font-bold mb-0 gradient-text">
+            <h1 className="mb-4 text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-0 gradient-text">
               Big Fi Protocol
             </h1>
-            <p className="text-xl text-secondary">The SuperApp DeFi Deserves</p>
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-secondary">
+              The SuperApp DeFi Deserves
+            </p>
           </div>
 
           {/* Token Status Cards */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-2">
+            {!userAddress && (
+              <div
+                className="flex grid-cols-1 xl:hidden card gap-4 items-center border-error w-full md:w-[70%] text-error !py-4 px-3 mr-4 start-end h-[75%]"
+                style={{ color: "red" }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-error"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <div>
+                  <p className="text-xs sm:text-sm md:text-base">
+                    Please connect your wallet to interact with this vault
+                  </p>
+                </div>
+              </div>
+            )}
             {/* {statsLoading && (                                                //statsLoding blocked by MOMO
               <div className="col-span-full text-center text-secondary">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
@@ -539,20 +578,20 @@ export default function LaunchApp() {
           {/* Main Interface */}
           <div className="grid grid-cols-1 xl:grid-cols-3 xl:gap-6">
             {/* Token Selection */}
-            <div className="lg:col-span-1 mb-4 xl:mb-0 backdrop-blur-md">
-              <div className="bg-panel/80 backdrop-blur-sm rounded-bigfi p-8 border border-primary transition-colors duration-300">
+            <div className="mb-4 xl:col-span-1 xl:mb-0 backdrop-blur-md">
+              <div className="bg-panel/80 backdrop-blur-sm rounded-bigfi !p-3 sm:!p-5 border border-primary transition-colors duration-300">
                 <div className="space-y-4">
                   {TOKENS.map((token, index) => (
                     <AnimatedCard
                       key={token.symbol}
                       onClick={() => setSelectedToken(token)}
-                      className={`${
+                      className={`!p-3 sm:!p-8 ${
                         token.symbol === "WBTC"
                           ? "card-btc"
                           : token.symbol === "ETH"
                           ? "card-eth"
                           : "card-usdc"
-                      }`}
+                      } `}
                     >
                       <div className="flex items-center gap-3 mb-4">
                         <TokenAvatar
@@ -561,12 +600,12 @@ export default function LaunchApp() {
                           size="md"
                         />
                         <div>
-                          <div className="text-4xl font-bold text-accent">
+                          <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-accent">
                             {token.symbol}
                           </div>
                         </div>
                         <div
-                          className={`ml-auto rounded-full px-2 h-10 grid place-items-center relative overflow-hidden ${
+                          className={`ml-auto rounded-full px-1 sm:px-2 h-8 sm:h-10 grid place-items-center relative overflow-hidden ${
                             token.symbol === "WBTC"
                               ? "btc-style"
                               : token.symbol === "ETH"
@@ -574,19 +613,19 @@ export default function LaunchApp() {
                               : "usdc-style"
                           }`}
                         >
-                          <span className="relative z-10 flex items-center">
+                          <span className="relative z-10 flex items-center text-xs sm:text-sm md:text-base">
                             {token.apy}% APY
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
-                              width="16"
-                              height="16"
+                              width="12"
+                              height="12"
                               viewBox="0 0 24 24"
                               fill="none"
                               stroke="currentColor"
                               strokeWidth="2"
                               strokeLinecap="round"
                               strokeLinejoin="round"
-                              className="lucide lucide-sparkles"
+                              className="hidden sm:block lucide lucide-sparkles sm:w-4 sm:h-4 md:w-5 md:h-5"
                             >
                               <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
                               <path d="M20 3v4" />
@@ -603,17 +642,17 @@ export default function LaunchApp() {
                       <div className="w-full h-0.5 bg-neutral-700"></div>
 
                       <div className="mb-3">
-                        <div className="text-3xl text-accent2 h-[40px]">
-                          <span className="text-2xl font-bold text-black dark:text-white">
+                        <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl text-accent2 h-[40px]">
+                          <span className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-black dark:text-white">
                             {allTokenStats.find(
                               (stat) => stat.symbol === token.symbol
                             )?.tvl || "0"}{" "}
-                            <span className="text-base text-gray-500">
+                            <span className="text-sm sm:text-base md:text-lg text-gray-500">
                               {token.symbol}
                             </span>
                           </span>
                         </div>
-                        <p className=" text-black dark:text-white text-base">
+                        <p className="text-black dark:text-white text-sm sm:text-base md:text-lg">
                           Total Locked Value
                         </p>
                       </div>
@@ -713,7 +752,7 @@ export default function LaunchApp() {
               className="lg:col-span-2 h-[780px] xl:h-full rounded-bigfi border border-primary"
               style={{ zIndex: "10" }}
             >
-              <div className="h-full flex flex-col pl-5 pr-5">
+              <div className="h-full flex flex-col !px-3 sm:!px-5">
                 {/* 2/9 height */}
                 <div className="h-[10%]">
                   <div className="flex justify-between w-full mt-4">
@@ -724,13 +763,13 @@ export default function LaunchApp() {
                         alt={selectedToken.symbol}
                         className="w-12 h-12 rounded-full"
                       />
-                      <h1 className="text-2xl font-bold">
+                      <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold">
                         {selectedToken.symbol}
                       </h1>
                     </div>
                     {!userAddress && (
                       <div
-                        className="card flex gap-4 items-center border-error w-[50%] text-error !py-4 px-3 mr-4 start-end h-[75%]"
+                        className="hidden xl:flex card flex gap-4 items-center border-error w-[60%] text-error !py-4 px-3 mr-4 start-end h-[75%]"
                         style={{ color: "red" }}
                       >
                         <svg
@@ -750,7 +789,7 @@ export default function LaunchApp() {
                           <line x1="12" y1="16" x2="12.01" y2="16" />
                         </svg>
                         <div>
-                          <p>
+                          <p className="text-xs sm:text-sm md:text-base">
                             Please connect your wallet to interact with this
                             vault
                           </p>
@@ -787,7 +826,7 @@ export default function LaunchApp() {
                 {/* 3/9 height */}
                 <div className="h-[37%]">
                   <div
-                    className={`card flex flex-col !p-4 ${
+                    className={`card flex flex-col h-[95%] !p-4 ${
                       selectedToken.symbol === "WBTC"
                         ? "card-btc-top"
                         : selectedToken.symbol === "ETH"
@@ -798,25 +837,25 @@ export default function LaunchApp() {
                     {/* Header Section */}
                     <div className="flex border-b border-gray-200 dark:border-opacity-10">
                       {/* Left Side */}
-                      <div className="flex-1 flex flex-col items-center border-r border-gray-200 dark:border-opacity-10 px-6 py-5">
+                      <div className="flex-1 flex flex-col items-center border-r border-gray-200 dark:border-opacity-10 !px-3 !py-3 sm:!px-3 sm:!py-5 sm:!px-6">
                         <div className="flex items-end gap-2">
-                          <p className="font-medium text-3xl">
+                          <p className="font-medium text-xl sm:text-2xl md:text-3xl lg:text-4xl">
                             {allTokenStats.find(
                               (stat) => stat.symbol === selectedToken.symbol
                             )?.tvl || "0"}{" "}
                           </p>
-                          <p className="text-gray-500 text-md">
+                          <p className="text-gray-500 text-sm sm:text-base md:text-lg">
                             {selectedToken.symbol}
                           </p>
                         </div>
-                        <p className="text-gray-500 dark:text-gray-400 font-extralight">
+                        <p className="text-gray-500 dark:text-gray-400 font-extralight text-xs sm:text-sm md:text-base">
                           Total Value Locked
                         </p>
                       </div>
 
                       {/* Right Side */}
                       <div
-                        className={`px-6 py-5 flex flex-col items-center ${
+                        className={`!px-3 !py-3 sm:!px-6 sm:!py-5 flex flex-col items-center ${
                           selectedToken.symbol === "WBTC"
                             ? "btc-style"
                             : selectedToken.symbol === "ETH"
@@ -825,18 +864,18 @@ export default function LaunchApp() {
                         }`}
                         style={{ background: "none" }}
                       >
-                        <p className="text-3xl flex items-center gap-2">
+                        <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl flex items-center gap-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
+                            width="20"
+                            height="20"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            className="lucide lucide-sparkles inline-block"
+                            className="lucide lucide-sparkles inline-block sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-10 lg:h-10"
                           >
                             <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
                             <path d="M20 3v4" />
@@ -846,7 +885,9 @@ export default function LaunchApp() {
                           </svg>
                           20%
                         </p>
-                        <p className="font-extralight">Estimated Yield</p>
+                        <p className="font-extralight text-xs sm:text-sm md:text-base">
+                          Estimated Yield
+                        </p>
                       </div>
                     </div>
                     <div className="w-full h-0.5 bg-neutral-700 mb-3"></div>
@@ -856,12 +897,12 @@ export default function LaunchApp() {
                       <div>
                         <div className="flex justify-between">
                           <p
-                            className="text-xl"
+                            className="text-sm sm:text-base md:text-xl lg:text-2xl"
                             style={{ color: "var(--color-text-secondary)" }}
                           >
                             Staked:
                           </p>
-                          <p className="text-xl">
+                          <p className="text-sm sm:text-base md:text-xl lg:text-2xl">
                             {userAddress ? (
                               <>
                                 {selectedToken.symbol === "USDC"
@@ -882,12 +923,12 @@ export default function LaunchApp() {
                         </div>
                         <div className="flex justify-between">
                           <p
-                            className="text-xl"
+                            className="text-sm sm:text-base md:text-xl lg:text-2xl"
                             style={{ color: "var(--color-text-secondary)" }}
                           >
                             Reward:
                           </p>
-                          <p className="text-xl">
+                          <p className="text-sm sm:text-base md:text-xl lg:text-2xl">
                             {userAddress ? (
                               <>
                                 {selectedToken.symbol === "USDC"
@@ -908,12 +949,12 @@ export default function LaunchApp() {
                         </div>
                         <div className="flex justify-between">
                           <p
-                            className="text-xl"
+                            className="text-sm sm:text-base md:text-xl lg:text-2xl"
                             style={{ color: "var(--color-text-secondary)" }}
                           >
                             Balance:
                           </p>
-                          <p className="text-xl">
+                          <p className="text-sm sm:text-base md:text-xl lg:text-2xl">
                             {userAddress ? (
                               <>
                                 {selectedToken.symbol === "USDC"
@@ -978,7 +1019,7 @@ export default function LaunchApp() {
                           }`}
                         >
                           <button
-                            className={`flex-1 py-3 text-xl font-semibold transition-all duration-200 focus:outline-none focus:ring-0 border-none ${
+                            className={`flex-1 py-3 text-sm sm:text-base md:text-xl lg:text-2xl font-semibold transition-all duration-200 focus:outline-none focus:ring-0 border-none ${
                               selectedToken.symbol === "WBTC" && tab === "stake"
                                 ? "btc-color"
                                 : selectedToken.symbol === "ETH" &&
@@ -1009,7 +1050,7 @@ export default function LaunchApp() {
                           }`}
                         >
                           <button
-                            className={`flex-1 py-3 text-xl font-semibold transition-all duration-200 focus:outline-none focus:ring-0 border-none ${
+                            className={`flex-1 py-3 text-sm sm:text-base md:text-xl lg:text-2xl font-semibold transition-all duration-200 focus:outline-none focus:ring-0 border-none ${
                               selectedToken.symbol === "WBTC" &&
                               tab === "withdraw"
                                 ? "btc-color"
@@ -1066,34 +1107,36 @@ export default function LaunchApp() {
                                   min="0"
                                   step="any"
                                   placeholder="0.00"
-                                  className="no-spinner flex-1 bg-transparent outline-none text-lg text-primary placeholder-secondary focus:outline-none focus:ring-0 focus:border-transparent"
+                                  className="no-spinner flex-1 bg-transparent outline-none text-xs sm:text-sm md:text-base lg:text-lg text-primary placeholder-secondary focus:outline-none focus:ring-0 focus:border-transparent min-w-0"
                                 />
                                 <button
-                                  className="mx-2 text-accent font-bold text-sm hover:opacity-80"
+                                  className="mx-1 sm:mx-2 text-accent font-bold text-xs sm:text-sm hover:opacity-80 px-1 sm:px-2 whitespace-nowrap"
                                   onClick={setMaxStake}
                                 >
                                   MAX
                                 </button>
-                                <span className="flex items-center gap-1 text-secondary font-semibold w-[80px]">
+                                <span className="flex items-center gap-1 text-secondary font-semibold min-w-0 flex-shrink-0">
                                   <img
                                     src={selectedToken.avatar}
                                     alt=""
-                                    className="w-6 h-6 inline-block rounded-full mr-1"
+                                    className="w-4 h-4 sm:w-6 sm:h-6 inline-block rounded-full mr-1 flex-shrink-0"
                                   />
-                                  {selectedToken.symbol}
+                                  <span className="text-xs sm:text-sm truncate">
+                                    {selectedToken.symbol}
+                                  </span>
                                 </span>
                               </div>
                             </div>
                             <div className="basis-2/4">
                               <br />
-                              <div className="mb-1 text-secondary text-xl">
+                              <div className="mb-1 text-secondary text-sm sm:text-base md:text-xl lg:text-2xl">
                                 Available to stake:{" "}
                                 <span className="text-primary font-medium">
                                   {getUserBalance()} {selectedToken.symbol}
                                 </span>
                               </div>
                               <br />
-                              <div className="mb-2 text-xl text-secondary">
+                              <div className="mb-2 text-sm sm:text-base md:text-xl lg:text-2xl text-secondary">
                                 The vault token for this strategy is{" "}
                                 <span className="text-accent font-semibold cursor-pointer">
                                   {selectedToken.vaultToken}
@@ -1102,7 +1145,7 @@ export default function LaunchApp() {
                             </div>
                             <div className="basis-1/4">
                               <button
-                                className={`button-default flex w-1/4 mx-auto justify-center mt-4 bg-primary border border-gray-600 transition-colors duration-200 hover:bg-primary-dark text-accent text-lg font-semibold py-3 rounded-bigfi ${
+                                className={`button-default flex w-32 h-12 mx-auto justify-center items-center mt-4 border border-gray-600 bg-primary transition-colors duration-200 hover:bg-primary-dark text-accent text-xl font-semibold rounded-bigfi ${
                                   !userAddress ? "cursor-not-allowed" : ""
                                 }`}
                                 onClick={handleStake}
@@ -1146,27 +1189,29 @@ export default function LaunchApp() {
                                   min="0"
                                   step="any"
                                   placeholder="0.00"
-                                  className="no-spinner flex-1 bg-transparent outline-none text-lg text-primary placeholder-secondary focus:outline-none focus:ring-0 focus:border-transparent"
+                                  className="no-spinner flex-1 bg-transparent outline-none text-xs sm:text-sm md:text-base lg:text-lg text-primary placeholder-secondary focus:outline-none focus:ring-0 focus:border-transparent min-w-0"
                                 />
                                 <button
-                                  className="mx-2 text-accent font-bold text-sm hover:opacity-80"
+                                  className="mx-1 sm:mx-2 text-accent font-bold text-xs sm:text-sm hover:opacity-80 px-1 sm:px-2 whitespace-nowrap"
                                   onClick={setMaxUnstake}
                                 >
                                   MAX
                                 </button>
-                                <span className="flex items-center gap-1 text-secondary font-semibold w-[80px]">
+                                <span className="flex items-center gap-1 text-secondary font-semibold min-w-0 flex-shrink-0">
                                   <img
                                     src={selectedToken.avatar}
                                     alt=""
-                                    className="w-6 h-6 inline-block rounded-full mr-1"
+                                    className="w-4 h-4 sm:w-6 sm:h-6 inline-block rounded-full mr-1 flex-shrink-0"
                                   />
-                                  {selectedToken.symbol}
+                                  <span className="text-xs sm:text-sm truncate">
+                                    {selectedToken.symbol}
+                                  </span>
                                 </span>
                               </div>
                             </div>
                             <div className="basis-2/4">
                               <br />
-                              <div className="mb-1 text-secondary text-xl">
+                              <div className="mb-1 text-secondary text-sm sm:text-base md:text-xl lg:text-2xl">
                                 Available to unstake:{" "}
                                 <span className="text-primary font-medium">
                                   {getUserStakedAmount()} {selectedToken.symbol}
@@ -1176,7 +1221,7 @@ export default function LaunchApp() {
                             </div>
                             <div className="basis-1/4">
                               <button
-                                className={`button-default flex w-1/4 mx-auto justify-center mt-4 border border-gray-600 bg-primary transition-colors duration-200 hover:bg-primary-dark text-accent text-lg font-semibold py-3 rounded-bigfi ${
+                                className={`button-default flex w-32 h-12 mx-auto justify-center items-center mt-4 border border-gray-600 bg-primary transition-colors duration-200 hover:bg-primary-dark text-accent text-xl font-semibold rounded-bigfi ${
                                   !userAddress ? "cursor-not-allowed" : ""
                                 }`}
                                 onClick={handleUnstake}
@@ -1194,7 +1239,7 @@ export default function LaunchApp() {
 
                         {/* Error Display */}
                         {stakingError && (
-                          <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm">
+                          <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-xs sm:text-sm md:text-base">
                             {stakingError}
                           </div>
                         )}
