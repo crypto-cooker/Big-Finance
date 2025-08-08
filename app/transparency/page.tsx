@@ -419,7 +419,7 @@ export default function Transparency() {
             <LoadingLink
               href="/launch"
               className="gradient-bg text-white px-8 py-4 rounded-lg font-semibold text-lg hover:opacity-90 transition-all duration-200 shadow-lg"
-              variant="button"
+              variant="nav"
             >
               Start Using BIG FI
             </LoadingLink>

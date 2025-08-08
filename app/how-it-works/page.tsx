@@ -352,7 +352,7 @@ export default function HowItWorks() {
             <LoadingLink
               href="/launch"
               className="gradient-bg text-white px-8 py-4 rounded-lg font-semibold text-lg hover:opacity-90 transition-all duration-200 shadow-lg inline-block"
-              variant="button"
+              variant="nav"
             >
               Start Earning Now
             </LoadingLink>

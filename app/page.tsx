@@ -293,14 +293,14 @@ export default function Home() {
               <LoadingLink
                 href="/launch"
                 className="gradient-bg text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:opacity-90 transition-all duration-200 shadow-lg"
-                variant="button"
+                variant="nav"
               >
                 Launch App
               </LoadingLink>
               <LoadingLink
                 href="/how-it-works"
                 className="border border-accent/50 text-accent px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-accent/10 transition-all duration-200"
-                variant="button"
+                variant="nav"
               >
                 Learn More
               </LoadingLink>
