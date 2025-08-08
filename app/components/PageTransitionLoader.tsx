@@ -33,15 +33,18 @@ export const PageTransitionLoader: React.FC<PageTransitionLoaderProps> = ({
 
     setLoadingText(getLoadingText(pathname));
 
+    // Show loading for initial page load
+    setIsLoading(true);
+
     // Hide loading after a short delay to simulate page load
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 500); // Reduced to 500ms for faster loading
+    }, 1000); // Increased to 1 second to make it more visible
 
     // Safety timeout to ensure loading is cleared
     const safetyTimer = setTimeout(() => {
       setIsLoading(false);
-    }, 2000); // 2 second safety timeout
+    }, 3000); // 3 second safety timeout
 
     // Ensure loading is cleared if component unmounts
     return () => {
@@ -51,11 +54,22 @@ export const PageTransitionLoader: React.FC<PageTransitionLoaderProps> = ({
     };
   }, [pathname]);
 
+  // Also show loading on initial mount
+  useEffect(() => {
+    console.log("PageTransitionLoader: Initial mount, showing loading");
+    const timer = setTimeout(() => {
+      console.log("PageTransitionLoader: Hiding loading after 1 second");
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <>
       {/* Page Transition Loading Overlay */}
       {isLoading && (
-        <div className="fixed inset-0 z-[9999] bg-primary/95 backdrop-blur-sm flex items-center justify-center">
+        <div className="fixed inset-0 z-[99999] bg-primary/95 backdrop-blur-sm flex items-center justify-center">
           <div className="flex flex-col items-center gap-6">
             {/* Animated Logo */}
             <div className="relative">

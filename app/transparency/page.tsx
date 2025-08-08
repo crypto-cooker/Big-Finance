@@ -19,11 +19,10 @@ export default function Transparency() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 flex items-center justify-center font-bold text-xl">
-                <TransparencyImage
+                <img
                   src="/logo.png"
                   alt="BIG FI Logo"
                   className="w-full h-full"
-                  priority={true}
                 />
               </div>
               <LoadingLink
