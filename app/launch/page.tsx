@@ -518,7 +518,7 @@ export default function LaunchApp() {
               </span>
               <span className="text-accent">🚀</span>
             </div>
-            <h1 className="mb-4 text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-0 gradient-text">
+            <h1 className="pb-4 text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-0 gradient-text">
               Big Fi Protocol
             </h1>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-secondary">
