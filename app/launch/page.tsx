@@ -419,493 +419,478 @@ export default function LaunchApp() {
           <div className="grid grid-cols-1 xl:grid-cols-3 xl:gap-6">
             {/* Token Selection */}
 
-              <div className="bg-panel/80 rounded-bigfi transition-colors duration-300">
-                <div className="space-y-4">
-                  {TOKENS.map((token, index) => (
-                    <AnimatedCard
-                      key={token.symbol}
-                      onClick={() => setSelectedToken(token)}
-                      className={`${
-                        token.symbol === "WBTC"
-                          ? "card-btc"
-                          : token.symbol === "ETH"
-                          ? "card-eth"
-                          : "card-usdc"
-                      } `}
-                    >
-                      <div className="flex items-center gap-2 mb-3 border-b border-white/10 hover:border-white/20 pb-3">
-                        <TokenAvatar
-                          symbol={token.symbol}
-                          src={token.avatar}
-                          size="md"
-                        />
-                        <div className="text-md sm:text-xl md:text-2xl lg:text-3xl font-semibold text-primary">
-                          {token.symbol}
-                        </div>
-                        <ApyGlow token={token} />
+              <div className="space-y-4 bg-panel/80 rounded-bigfi transition-colors duration-300 mb-4">
+                {TOKENS.map((token, index) => (
+                  <AnimatedCard
+                    key={token.symbol}
+                    onClick={() => setSelectedToken(token)}
+                    className={`${
+                      token.symbol === "WBTC"
+                        ? "card-btc"
+                        : token.symbol === "ETH"
+                        ? "card-eth"
+                        : "card-usdc"
+                    } `}
+                  >
+                    <div className="flex items-center gap-2 mb-3 border-b border-primary pb-3">
+                      <TokenAvatar
+                        symbol={token.symbol}
+                        src={token.avatar}
+                        size="md"
+                      />
+                      <div className="text-md sm:text-xl md:text-2xl lg:text-3xl font-semibold text-primary">
+                        {token.symbol}
                       </div>
-                      <div className="mb-3 border-b border-white/10 hover:border-white/20 pb-3">
-                        
-                        <div className="sm:text-xl md:text-2xl lg:text-3xl font-semibold text-primary">
-                          {allTokenStats.find(
-                            (stat) => stat.symbol === token.symbol
-                          )?.tvl || "0"}{" "}
-                          <span className="text-sm sm:text-base md:text-lg text-secondary">
-                            {token.symbol}
-                          </span>
-                        </div>
-                        <div className="text-secondary text-sm sm:text-base md:text-lg">
-                          Locked Value
-                        </div>
-                      </div>
+                      <ApyGlow token={token} />
+                    </div>
+                    <div className="mb-3 border-b border-primary pb-3">
                       
-                      <div>
-                        <div className="flex justify-between">
-                          <p className="text-secondary">Staked:</p>
-                          <p className="text-primary">
-                            {userAddress ? (
-                              <>
-                                {token.symbol === "USDC"
-                                  ? parseFloat(stakingData.usdcStaked).toFixed(2)
-                                  : token.symbol === "ETH"
-                                  ? parseFloat(stakingData.ethStaked).toFixed(4)
-                                  : parseFloat(stakingData.wbtcStaked).toFixed(6)}{" "}
-                                {token.symbol}
-                              </>
-                            ) : (
-                              "---"
-                            )}
-                          </p>
-                        </div>
-                        <div className="flex justify-between">
-                          <p className="text-secondary">Reward:</p>
-                          <p className="text-primary">
-                            {userAddress ? (
-                              <>
-                                {token.symbol === "USDC"
-                                  ? parseFloat(stakingData.usdcReward).toFixed(2)
-                                  : token.symbol === "ETH"
-                                  ? parseFloat(stakingData.ethReward).toFixed(4)
-                                  : parseFloat(stakingData.wbtcReward).toFixed(6)}{" "}
-                                {token.symbol}
-                              </>
-                            ) : (
-                              "---"
-                            )}
-                          </p>
-                        </div>
-                        <div className="flex justify-between">
-                          <p className="text-secondary">Balance:</p>
-                          <p className="text-primary">
-                            {userAddress ? (
-                              <>
-                                {token.symbol === "USDC"
-                                  ? parseFloat(stakingData.usdcBalance).toFixed(2)
-                                  : token.symbol === "ETH"
-                                  ? parseFloat(stakingData.ethBalance).toFixed(4)
-                                  : parseFloat(stakingData.wbtcBalance).toFixed(6)}{" "}
-                                {token.symbol}
-                              </>
-                            ) : (
-                              "---"
-                            )}
-                          </p>
-                        </div>
+                      <div className="sm:text-xl md:text-2xl lg:text-3xl font-semibold text-primary">
+                        {allTokenStats.find(
+                          (stat) => stat.symbol === token.symbol
+                        )?.tvl || "0"}{" "}
+                        <span className="text-sm sm:text-base md:text-lg text-secondary">
+                          {token.symbol}
+                        </span>
                       </div>
-                    </AnimatedCard>
-                  ))}
-                </div>
+                      <div className="text-secondary text-sm sm:text-base md:text-lg">
+                        Locked Value
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="flex justify-between">
+                        <p className="text-secondary">Staked:</p>
+                        <p className="text-primary">
+                          {userAddress ? (
+                            <>
+                              {token.symbol === "USDC"
+                                ? parseFloat(stakingData.usdcStaked).toFixed(2)
+                                : token.symbol === "ETH"
+                                ? parseFloat(stakingData.ethStaked).toFixed(4)
+                                : parseFloat(stakingData.wbtcStaked).toFixed(6)}{" "}
+                              {token.symbol}
+                            </>
+                          ) : (
+                            "---"
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex justify-between">
+                        <p className="text-secondary">Reward:</p>
+                        <p className="text-primary">
+                          {userAddress ? (
+                            <>
+                              {token.symbol === "USDC"
+                                ? parseFloat(stakingData.usdcReward).toFixed(2)
+                                : token.symbol === "ETH"
+                                ? parseFloat(stakingData.ethReward).toFixed(4)
+                                : parseFloat(stakingData.wbtcReward).toFixed(6)}{" "}
+                              {token.symbol}
+                            </>
+                          ) : (
+                            "---"
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex justify-between">
+                        <p className="text-secondary">Balance:</p>
+                        <p className="text-primary">
+                          {userAddress ? (
+                            <>
+                              {token.symbol === "USDC"
+                                ? parseFloat(stakingData.usdcBalance).toFixed(2)
+                                : token.symbol === "ETH"
+                                ? parseFloat(stakingData.ethBalance).toFixed(4)
+                                : parseFloat(stakingData.wbtcBalance).toFixed(6)}{" "}
+                              {token.symbol}
+                            </>
+                          ) : (
+                            "---"
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </AnimatedCard>
+                ))}
               </div>
 
             {/* Staking/Withdraw Interface */}
-            <div className="lg:col-span-2 h-[780px] xl:h-full rounded-bigfi border border-primary">
-              <div className="h-full flex flex-col !px-3 sm:!px-5">
+            <div className="lg:col-span-2 rounded-bigfi !p-5 border border-primary">
                 {/* Header */}
-                <div className="h-[10%]">
-                  <div className="flex justify-between w-full mt-4">
-                    <div className="flex gap-4 items-center ml-8">
-                      <img
-                        src={selectedToken.avatar}
-                        alt={selectedToken.symbol}
-                        className="w-12 h-12 rounded-full"
-                      />
-                      <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold">
-                        {selectedToken.symbol}
-                      </h1>
-                    </div>
+                <div className="flex justify-between w-full mb-4">
+                  <div className="flex gap-4 items-center">
+                    <img
+                      src={selectedToken.avatar}
+                      alt={selectedToken.symbol}
+                      className="w-8 h-8 rounded-full"
+                    />
+                    <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold">
+                      {selectedToken.symbol}
+                    </h1>
                   </div>
                 </div>
 
                 {/* Stats Section */}
-                <div className="h-[37%]">
-                  <div
-                    className={`card flex flex-col h-[95%] !p-4 ${
-                      selectedToken.symbol === "WBTC"
-                        ? "card-btc-top"
-                        : selectedToken.symbol === "ETH"
-                        ? "card-eth-top"
-                        : "card-usdc-top"
-                    }`}
-                  >
-                    <div className="flex border-b border-primary/20">
-                      <div className="flex-1 flex flex-col items-center border-r border-primary/20 !px-3 !py-3 sm:!px-3 sm:!py-5 sm:!px-6">
-                        <div className="flex items-end gap-2">
-                          <p className="font-medium text-xl sm:text-2xl md:text-3xl lg:text-4xl text-primary">
-                            {allTokenStats.find(
-                              (stat) => stat.symbol === selectedToken.symbol
-                            )?.tvl || "0"}{" "}
-                          </p>
-                          <p className="text-secondary text-sm sm:text-base md:text-lg">
-                            {selectedToken.symbol}
-                          </p>
-                        </div>
-                        <p className="text-secondary font-extralight text-xs sm:text-sm md:text-base">
-                          Total Value Locked
+                <div
+                  className={`flex flex-col rounded-bigfi transition-colors duration-300 mb-4 ${
+                    selectedToken.symbol === "WBTC"
+                      ? "card-btc-top"
+                      : selectedToken.symbol === "ETH"
+                      ? "card-eth-top"
+                      : "card-usdc-top"
+                  }`}
+                >
+                  <div className="flex border-b border-primary">
+                    <div className="flex-1 flex flex-col items-center border-r border-primary p-2">
+                      <div className="flex items-end gap-2">
+                        <p className="font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-primary">
+                          {allTokenStats.find(
+                            (stat) => stat.symbol === selectedToken.symbol
+                          )?.tvl || "0"}{" "}
+                        </p>
+                        <p className="text-secondary text-sm sm:text-base md:text-lg">
+                          {selectedToken.symbol}
                         </p>
                       </div>
-
-                      <div
-                        className={`!px-3 !py-3 sm:!px-6 sm:!py-5 flex flex-col items-center ${
-                          selectedToken.symbol === "WBTC"
-                            ? "btc-style"
-                            : selectedToken.symbol === "ETH"
-                            ? "eth-style"
-                            : "usdc-style"
-                        }`}
-                      >
-                        <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl flex items-center gap-2">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="lucide lucide-sparkles inline-block sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-10 lg:h-10"
-                          >
-                            <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
-                            <path d="M20 3v4" />
-                            <path d="M22 5h-4" />
-                            <path d="M4 17v2" />
-                            <path d="M5 18H3" />
-                          </svg>
-                          20%
-                        </p>
-                        <p className="font-extralight text-xs sm:text-sm md:text-base text-secondary">
-                          Estimated Yield
-                        </p>
-                      </div>
+                      <p className="text-secondary font-extralight text-xs sm:text-sm md:text-base">
+                        Total Value Locked
+                      </p>
                     </div>
-                    
-                    <div className="w-full h-0.5 bg-primary/30 mb-3"></div>
 
-                    <div className="px-6 py-5">
-                      <div>
-                        <div className="flex justify-between">
-                          <p className="text-sm sm:text-base md:text-xl lg:text-2xl text-secondary">
-                            Staked:
-                          </p>
-                          <p className="text-sm sm:text-base md:text-xl lg:text-2xl text-primary">
-                            {userAddress ? (
-                              <>
-                                {selectedToken.symbol === "USDC"
-                                  ? parseFloat(stakingData.usdcStaked).toFixed(2)
-                                  : selectedToken.symbol === "ETH"
-                                  ? parseFloat(stakingData.ethStaked).toFixed(4)
-                                  : parseFloat(stakingData.wbtcStaked).toFixed(6)}{" "}
-                                {selectedToken.symbol}
-                              </>
-                            ) : (
-                              "---"
-                            )}
-                          </p>
-                        </div>
-                        <div className="flex justify-between">
-                          <p className="text-sm sm:text-base md:text-xl lg:text-2xl text-secondary">
-                            Reward:
-                          </p>
-                          <p className="text-sm sm:text-base md:text-xl lg:text-2xl text-primary">
-                            {userAddress ? (
-                              <>
-                                {selectedToken.symbol === "USDC"
-                                  ? parseFloat(stakingData.usdcReward).toFixed(2)
-                                  : selectedToken.symbol === "ETH"
-                                  ? parseFloat(stakingData.ethReward).toFixed(4)
-                                  : parseFloat(stakingData.wbtcReward).toFixed(6)}{" "}
-                                {selectedToken.symbol}
-                              </>
-                            ) : (
-                              "---"
-                            )}
-                          </p>
-                        </div>
-                        <div className="flex justify-between">
-                          <p className="text-sm sm:text-base md:text-xl lg:text-2xl text-secondary">
-                            Balance:
-                          </p>
-                          <p className="text-sm sm:text-base md:text-xl lg:text-2xl text-primary">
-                            {userAddress ? (
-                              <>
-                                {selectedToken.symbol === "USDC"
-                                  ? parseFloat(stakingData.usdcBalance).toFixed(2)
-                                  : selectedToken.symbol === "ETH"
-                                  ? parseFloat(stakingData.ethBalance).toFixed(4)
-                                  : parseFloat(stakingData.wbtcBalance).toFixed(6)}{" "}
-                                {selectedToken.symbol}
-                              </>
-                            ) : (
-                              "---"
-                            )}
-                          </p>
-                        </div>
+                    <div
+                      className={`p-4 flex flex-col items-center !bg-transparent ${
+                        selectedToken.symbol === "WBTC"
+                          ? "btc-style"
+                          : selectedToken.symbol === "ETH"
+                          ? "eth-style"
+                          : "usdc-style"
+                      }`}
+                    >
+                      <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl flex items-center gap-2">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="lucide lucide-sparkles inline-block sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-10 lg:h-10"
+                        >
+                          <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
+                          <path d="M20 3v4" />
+                          <path d="M22 5h-4" />
+                          <path d="M4 17v2" />
+                          <path d="M5 18H3" />
+                        </svg>
+                        20%
+                      </p>
+                      <p className="font-extralight text-xs sm:text-sm md:text-base text-secondary">
+                        Estimated Yield
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="px-6 py-5">
+                    <div>
+                      <div className="flex justify-between">
+                        <p className="md:text-sm lg:text-xl text-secondary">
+                          Staked:
+                        </p>
+                        <p className="md:text-sm lg:text-xl text-primary">
+                          {userAddress ? (
+                            <>
+                              {selectedToken.symbol === "USDC"
+                                ? parseFloat(stakingData.usdcStaked).toFixed(2)
+                                : selectedToken.symbol === "ETH"
+                                ? parseFloat(stakingData.ethStaked).toFixed(4)
+                                : parseFloat(stakingData.wbtcStaked).toFixed(6)}{" "}
+                              {selectedToken.symbol}
+                            </>
+                          ) : (
+                            "---"
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex justify-between">
+                        <p className="md:text-sm lg:text-xl text-secondary">
+                          Reward:
+                        </p>
+                        <p className="md:text-sm lg:text-xl text-primary">
+                          {userAddress ? (
+                            <>
+                              {selectedToken.symbol === "USDC"
+                                ? parseFloat(stakingData.usdcReward).toFixed(2)
+                                : selectedToken.symbol === "ETH"
+                                ? parseFloat(stakingData.ethReward).toFixed(4)
+                                : parseFloat(stakingData.wbtcReward).toFixed(6)}{" "}
+                              {selectedToken.symbol}
+                            </>
+                          ) : (
+                            "---"
+                          )}
+                        </p>
+                      </div>
+                      <div className="flex justify-between">
+                        <p className="md:text-sm lg:text-xl text-secondary">
+                          Balance:
+                        </p>
+                        <p className="md:text-sm lg:text-xl text-primary">
+                          {userAddress ? (
+                            <>
+                              {selectedToken.symbol === "USDC"
+                                ? parseFloat(stakingData.usdcBalance).toFixed(2)
+                                : selectedToken.symbol === "ETH"
+                                ? parseFloat(stakingData.ethBalance).toFixed(4)
+                                : parseFloat(stakingData.wbtcBalance).toFixed(6)}{" "}
+                              {selectedToken.symbol}
+                            </>
+                          ) : (
+                            "---"
+                          )}
+                        </p>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Action Section */}
-                <div className="h-[50%]">
-                  <div
-                    className={`card h-full w-full !p-0 mb-auto overflow-visible ${
-                      selectedToken.symbol === "WBTC"
-                        ? "card-btc"
-                        : selectedToken.symbol === "ETH"
-                        ? "card-eth"
-                        : "card-usdc"
-                    }`}
-                  >
-                    <div className="h-full flex flex-col">
-                      <div className="flex divide-x divide-primary/20 cursor-pointer rounded-t-2xl overflow-hidden">
-                        <div
-                          className={`flex-1 p-4 flex items-center justify-center body2 ${
+                <div
+                  className={`card !p-0 ${
+                    selectedToken.symbol === "WBTC"
+                      ? "card-btc"
+                      : selectedToken.symbol === "ETH"
+                      ? "card-eth"
+                      : "card-usdc"
+                  }`}
+                >
+                  <div className="h-full flex flex-col">
+                    <div className="flex divide-primary/20 cursor-pointer rounded-t-2xl overflow-hidden">
+                      <div
+                        className={`flex-1 p-2 flex items-center justify-center ${
+                          tab === "stake"
+                            ? "bg-gradient-to-r from-primary/10 to-accent/10"
+                            : "bg-background-dark"
+                        }`}
+                      >
+                        <button
+                          className={`flex-1 py-3 text-sm sm:text-base md:text-xl lg:text-2xl font-semibold transition-all duration-200 focus:outline-none focus:ring-0 border-none ${
+                            selectedToken.symbol === "WBTC" && tab === "stake"
+                              ? "btc-color"
+                              : selectedToken.symbol === "ETH" &&
+                                tab === "stake"
+                              ? "eth-color"
+                              : selectedToken.symbol === "USDC" &&
+                                tab === "stake"
+                              ? "usdc-color"
+                              : "text-primary"
+                          } ${
                             tab === "stake"
                               ? "bg-gradient-to-r from-primary/10 to-accent/10"
-                              : "bg-background-dark"
+                              : "text-primary"
                           }`}
+                          onClick={() => {
+                            setTab("stake");
+                            setTxStatus(null);
+                          }}
                         >
-                          <button
-                            className={`flex-1 py-3 text-sm sm:text-base md:text-xl lg:text-2xl font-semibold transition-all duration-200 focus:outline-none focus:ring-0 border-none ${
-                              selectedToken.symbol === "WBTC" && tab === "stake"
-                                ? "btc-color"
-                                : selectedToken.symbol === "ETH" &&
-                                  tab === "stake"
-                                ? "eth-color"
-                                : selectedToken.symbol === "USDC" &&
-                                  tab === "stake"
-                                ? "usdc-color"
-                                : "text-primary"
-                            } ${
-                              tab === "stake"
-                                ? "bg-gradient-to-r from-primary/10 to-accent/10"
-                                : "text-primary"
-                            }`}
-                            onClick={() => {
-                              setTab("stake");
-                              setTxStatus(null);
-                            }}
-                          >
-                            Stake
-                          </button>
-                        </div>
-                        <div
-                          className={`flex-1 p-4 flex items-center justify-center body2 ${
+                          Stake
+                        </button>
+                      </div>
+                      <div
+                        className={`flex-1 p-2 flex items-center justify-center body2 ${
+                          tab === "withdraw"
+                            ? "bg-gradient-to-r from-primary/10 to-accent/10"
+                            : "bg-background-dark"
+                        }`}
+                      >
+                        <button
+                          className={`flex-1 py-3 text-sm sm:text-base md:text-xl lg:text-2xl font-semibold transition-all duration-200 focus:outline-none focus:ring-0 border-none ${
+                            selectedToken.symbol === "WBTC" &&
+                            tab === "withdraw"
+                              ? "btc-color"
+                              : selectedToken.symbol === "ETH" &&
+                                tab === "withdraw"
+                              ? "eth-color"
+                              : selectedToken.symbol === "USDC" &&
+                                tab === "withdraw"
+                              ? "usdc-color"
+                              : "text-primary"
+                          } ${
                             tab === "withdraw"
                               ? "bg-gradient-to-r from-primary/10 to-accent/10"
-                              : "bg-background-dark"
+                              : "text-primary"
                           }`}
+                          onClick={() => {
+                            setTab("withdraw");
+                            setTxStatus(null);
+                          }}
                         >
-                          <button
-                            className={`flex-1 py-3 text-sm sm:text-base md:text-xl lg:text-2xl font-semibold transition-all duration-200 focus:outline-none focus:ring-0 border-none ${
-                              selectedToken.symbol === "WBTC" &&
-                              tab === "withdraw"
-                                ? "btc-color"
-                                : selectedToken.symbol === "ETH" &&
-                                  tab === "withdraw"
-                                ? "eth-color"
-                                : selectedToken.symbol === "USDC" &&
-                                  tab === "withdraw"
-                                ? "usdc-color"
-                                : "text-primary"
-                            } ${
-                              tab === "withdraw"
-                                ? "bg-gradient-to-r from-primary/10 to-accent/10"
-                                : "text-primary"
-                            }`}
-                            onClick={() => {
-                              setTab("withdraw");
-                              setTxStatus(null);
-                            }}
-                          >
-                            Unstake
-                          </button>
-                        </div>
+                          Unstake
+                        </button>
                       </div>
-                      
-                      <div className="p-6 h-full flex flex-col">
-                        {tab === "stake" ? (
-                          <>
-                            <div className="basis-1/4">
-                              <div className="rounded-bigfi border border-primary transition-colors duration-300 flex items-center px-4 py-3 mb-4">
-                                <input
-                                  type="number"
-                                  value={amount}
-                                  onChange={(e) => {
-                                    const value = e.target.value;
-                                    if (value === "" || parseFloat(value) >= 0) {
-                                      setAmount(value);
-                                    }
-                                  }}
-                                  onKeyDown={(e) => {
-                                    if (
-                                      e.key === "-" ||
-                                      e.key === "e" ||
-                                      e.key === "E"
-                                    ) {
-                                      e.preventDefault();
-                                    }
-                                  }}
-                                  min="0"
-                                  step="any"
-                                  placeholder="0.00"
-                                  className="no-spinner flex-1 bg-transparent outline-none text-xs sm:text-sm md:text-base lg:text-lg text-primary placeholder-secondary focus:outline-none focus:ring-0 focus:border-transparent min-w-0"
-                                />
-                                <button
-                                  className="mx-1 sm:mx-2 text-accent font-bold text-xs sm:text-sm hover:opacity-80 px-1 sm:px-2 whitespace-nowrap"
-                                  onClick={setMaxStake}
-                                >
-                                  MAX
-                                </button>
-                                <span className="flex items-center gap-1 text-secondary font-semibold min-w-0 flex-shrink-0">
-                                  <img
-                                    src={selectedToken.avatar}
-                                    alt=""
-                                    className="w-4 h-4 sm:w-6 sm:h-6 inline-block rounded-full mr-1 flex-shrink-0"
-                                  />
-                                  <span className="text-xs sm:text-sm truncate">
-                                    {selectedToken.symbol}
-                                  </span>
-                                </span>
-                              </div>
-                            </div>
-                            
-                            <div className="basis-2/4">
-                              <br />
-                              <div className="mb-1 text-secondary text-sm sm:text-base md:text-xl lg:text-2xl">
-                                Available to stake:{" "}
-                                <span className="text-primary font-medium">
-                                  {getUserBalance()} {selectedToken.symbol}
-                                </span>
-                              </div>
-                              <br />
-                              <div className="mb-2 text-sm sm:text-base md:text-xl lg:text-2xl text-secondary">
-                                The vault token for this strategy is{" "}
-                                <span className="text-accent font-semibold cursor-pointer">
-                                  {selectedToken.vaultToken}
-                                </span>
-                              </div>
-                            </div>
-                            
-                            <div className="basis-1/4">
+                    </div>
+                    
+                    <div className="p-6 h-full flex flex-col">
+                      {tab === "stake" ? (
+                        <>
+                          <div className="basis-1/4">
+                            <div className="rounded-bigfi border border-primary transition-colors duration-300 flex items-center px-4 py-3 mb-4">
+                              <input
+                                type="number"
+                                value={amount}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value === "" || parseFloat(value) >= 0) {
+                                    setAmount(value);
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (
+                                    e.key === "-" ||
+                                    e.key === "e" ||
+                                    e.key === "E"
+                                  ) {
+                                    e.preventDefault();
+                                  }
+                                }}
+                                min="0"
+                                step="any"
+                                placeholder="0.00"
+                                className="no-spinner flex-1 bg-transparent outline-none text-xs sm:text-sm md:text-base lg:text-lg text-primary placeholder-secondary focus:outline-none focus:ring-0 focus:border-transparent min-w-0"
+                              />
                               <button
-                                className={`button-default flex w-32 h-12 mx-auto justify-center items-center mt-4 border border-gray-600 bg-primary transition-colors duration-200 hover:bg-primary-dark text-accent text-xl font-semibold rounded-bigfi ${
-                                  !userAddress ? "cursor-not-allowed" : ""
-                                }`}
-                                onClick={handleStake}
+                                className="mx-1 sm:mx-2 text-accent font-bold text-xs sm:text-sm hover:opacity-80 px-1 sm:px-2 whitespace-nowrap"
+                                onClick={setMaxStake}
                               >
-                                {txStatus
-                                  ? txStatus
-                                  : stakingLoading
-                                  ? "Loading..."
-                                  : "Stake"}
+                                MAX
                               </button>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            <div className="basis-1/4">
-                              <div className="rounded-bigfi border border-primary transition-colors duration-300 flex items-center px-4 py-3 mb-4">
-                                <input
-                                  type="number"
-                                  value={withdrawAmount}
-                                  onChange={(e) => {
-                                    const value = e.target.value;
-                                    if (value === "" || parseFloat(value) >= 0) {
-                                      setWithdrawAmount(value);
-                                    }
-                                  }}
-                                  onKeyDown={(e) => {
-                                    if (
-                                      e.key === "-" ||
-                                      e.key === "e" ||
-                                      e.key === "E"
-                                    ) {
-                                      e.preventDefault();
-                                    }
-                                  }}
-                                  min="0"
-                                  step="any"
-                                  placeholder="0.00"
-                                  className="no-spinner flex-1 bg-transparent outline-none text-xs sm:text-sm md:text-base lg:text-lg text-primary placeholder-secondary focus:outline-none focus:ring-0 focus:border-transparent min-w-0"
+                              <span className="flex items-center gap-1 text-secondary font-semibold min-w-0 flex-shrink-0">
+                                <img
+                                  src={selectedToken.avatar}
+                                  alt=""
+                                  className="w-4 h-4 sm:w-6 sm:h-6 inline-block rounded-full mr-1 flex-shrink-0"
                                 />
-                                <button
-                                  className="mx-1 sm:mx-2 text-accent font-bold text-xs sm:text-sm hover:opacity-80 px-1 sm:px-2 whitespace-nowrap"
-                                  onClick={setMaxUnstake}
-                                >
-                                  MAX
-                                </button>
-                                <span className="flex items-center gap-1 text-secondary font-semibold min-w-0 flex-shrink-0">
-                                  <img
-                                    src={selectedToken.avatar}
-                                    alt=""
-                                    className="w-4 h-4 sm:w-6 sm:h-6 inline-block rounded-full mr-1 flex-shrink-0"
-                                  />
-                                  <span className="text-xs sm:text-sm truncate">
-                                    {selectedToken.symbol}
-                                  </span>
+                                <span className="text-xs sm:text-sm truncate">
+                                  {selectedToken.symbol}
                                 </span>
-                              </div>
+                              </span>
                             </div>
-                            
-                            <div className="basis-2/4">
-                              <br />
-                              <div className="mb-1 text-secondary text-sm sm:text-base md:text-xl lg:text-2xl">
-                                Available to unstake:{" "}
-                                <span className="text-primary font-medium">
-                                  {getUserStakedAmount()} {selectedToken.symbol}
-                                </span>
-                              </div>
-                            </div>
-                            
-                            <div className="basis-1/4">
-                              <button
-                                className={`button-default flex w-32 h-12 mx-auto justify-center items-center mt-4 border border-gray-600 bg-primary transition-colors duration-200 hover:bg-primary-dark text-accent text-xl font-semibold rounded-bigfi ${
-                                  !userAddress ? "cursor-not-allowed" : ""
-                                }`}
-                                onClick={handleUnstake}
-                              >
-                                {txStatus
-                                  ? txStatus
-                                  : stakingLoading
-                                  ? "Loading..."
-                                  : "Unstake"}
-                              </button>
-                            </div>
-                          </>
-                        )}
-
-                        {stakingError && (
-                          <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-xs sm:text-sm md:text-base">
-                            {stakingError}
                           </div>
-                        )}
-                      </div>
+                          
+                          <div className="basis-2/4">
+                            <div className="mb-1 text-secondary text-sm sm:text-base md:text-sm lg:text-xl">
+                              Available to stake:{" "}
+                              <span className="text-primary font-semibold">
+                                {getUserBalance()} {selectedToken.symbol}
+                              </span>
+                            </div>
+                            <div className="mb-2 text-sm sm:text-base md:text-sm lg:text-xl text-secondary">
+                              The vault token for this strategy is{" "}
+                              <span className="text-accent font-semibold">
+                                {selectedToken.vaultToken}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="basis-1/4">
+                            <button
+                              className={`button-default flex w-full  h-12 mx-auto justify-center items-center mt-4 border border-gray-600 bg-primary transition-colors duration-200 hover:bg-primary-dark text-accent text-xl font-semibold rounded-bigfi ${
+                                !userAddress ? "cursor-not-allowed" : ""
+                              }`}
+                              onClick={handleStake}
+                            >
+                              {txStatus
+                                ? txStatus
+                                : stakingLoading
+                                ? "Loading..."
+                                : "Stake"}
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="basis-1/4">
+                            <div className="rounded-bigfi border border-primary transition-colors duration-300 flex items-center px-4 py-3 mb-4">
+                              <input
+                                type="number"
+                                value={withdrawAmount}
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value === "" || parseFloat(value) >= 0) {
+                                    setWithdrawAmount(value);
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (
+                                    e.key === "-" ||
+                                    e.key === "e" ||
+                                    e.key === "E"
+                                  ) {
+                                    e.preventDefault();
+                                  }
+                                }}
+                                min="0"
+                                step="any"
+                                placeholder="0.00"
+                                className="no-spinner flex-1 bg-transparent outline-none text-xs sm:text-sm md:text-base lg:text-lg text-primary placeholder-secondary focus:outline-none focus:ring-0 focus:border-transparent min-w-0"
+                              />
+                              <button
+                                className="mx-1 sm:mx-2 text-accent font-bold text-xs sm:text-sm hover:opacity-80 px-1 sm:px-2 whitespace-nowrap"
+                                onClick={setMaxUnstake}
+                              >
+                                MAX
+                              </button>
+                              <span className="flex items-center gap-1 text-secondary font-semibold min-w-0 flex-shrink-0">
+                                <img
+                                  src={selectedToken.avatar}
+                                  alt=""
+                                  className="w-4 h-4 sm:w-6 sm:h-6 inline-block rounded-full mr-1 flex-shrink-0"
+                                />
+                                <span className="text-xs sm:text-sm truncate">
+                                  {selectedToken.symbol}
+                                </span>
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="basis-2/4">
+                            <div className="mb-1 text-secondary text-sm sm:text-base md:text-sm lg:text-xl">
+                              Available to unstake:{" "}
+                              <span className="text-primary font-semibold">
+                                {getUserStakedAmount()} {selectedToken.symbol}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="basis-1/4">
+                            <button
+                              className={`button-default flex w-full h-12 mx-auto justify-center items-center mt-4 border border-gray-600 bg-primary transition-colors duration-200 hover:bg-primary-dark text-accent text-xl font-semibold rounded-bigfi ${
+                                !userAddress ? "cursor-not-allowed" : ""
+                              }`}
+                              onClick={handleUnstake}
+                            >
+                              {txStatus
+                                ? txStatus
+                                : stakingLoading
+                                ? "Loading..."
+                                : "Unstake"}
+                            </button>
+                          </div>
+                        </>
+                      )}
+
+                      {stakingError && (
+                        <div className="mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-xs sm:text-sm md:text-base">
+                          {stakingError}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-              </div>
             </div>
           </div>
         </div>
