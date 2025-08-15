@@ -39,7 +39,7 @@ export default function RootLayout({
         {/* <Animation /> */}
         <div className="relative z-[1] hide-scrollbar overflow-y-scroll h-screen">
           <Providers>
-            <PageTransitionLoader>{children}</PageTransitionLoader>
+            {children}
           </Providers>
         </div>
       </body>

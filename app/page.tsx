@@ -244,14 +244,14 @@ export default function Home() {
             <div className="hidden md:flex items-center space-x-8">
               <LoadingLink
                 href="/how-it-works"
-                className="text-accent hover:text-accent2 transition-colors"
+                className="text-primary transition-colors"
                 variant="nav"
               >
                 How it works
               </LoadingLink>
               <LoadingLink
                 href="/transparency"
-                className="text-accent hover:text-accent2 transition-colors"
+                className="text-primary transition-colors"
                 variant="nav"
               >
                 Transparency
@@ -374,7 +374,7 @@ export default function Home() {
                     {/* ✅ FIXED: Better formatting and loading state */}
                     Locked Value
                   </p>
-                  <div className="text-xl sm:text-2xl md:text-3xl text-accent2 mb-1 transition-all duration-500 ease-out transform-gpu">
+                  <div className="text-xl sm:text-2xl md:text-3xl text-primary mb-1 transition-all duration-500 ease-out transform-gpu">
                     {isLoading
                       ? "---"
                       : `${tokenStats[index].locked.toLocaleString()} `}{" "}

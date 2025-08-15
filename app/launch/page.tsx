@@ -307,14 +307,14 @@ export default function LaunchApp() {
             <div className="hidden md:flex items-center space-x-8">
               <LoadingLink
                 href="/how-it-works"
-                className="text-accent hover:text-accent2 transition-colors"
+                className="text-primary transition-colors"
                 variant="nav"
               >
                 How it works
               </LoadingLink>
               <LoadingLink
                 href="/transparency"
-                className="text-accent hover:text-accent2 transition-colors"
+                className="text-primary transition-colors"
                 variant="nav"
               >
                 Transparency
@@ -542,7 +542,7 @@ export default function LaunchApp() {
                   }`}
                 >
                   <div className="flex border-b border-primary">
-                    <div className="flex-1 flex flex-col items-center border-r border-primary p-2">
+                    <div className="flex-1 flex flex-col justify-center items-center border-r border-primary p-2">
                       <div className="flex items-end gap-2">
                         <p className="font-semibold text-xl sm:text-2xl md:text-3xl lg:text-4xl text-primary">
                           {allTokenStats.find(
