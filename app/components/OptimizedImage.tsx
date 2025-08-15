@@ -16,8 +16,8 @@ interface OptimizedImageProps {
 export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   src,
   alt,
-  width = 40,
-  height = 40,
+  width = 20,
+  height = 20,
   className = "",
   priority = false,
   fallback = "/images/placeholder.png",
@@ -88,9 +88,9 @@ export const TokenAvatar: React.FC<{
   size?: "sm" | "md" | "lg";
 }> = ({ symbol, src, size = "md" }) => {
   const sizeMap = {
-    sm: { width: 24, height: 24 },
-    md: { width: 40, height: 40 },
-    lg: { width: 64, height: 64 },
+    sm: { width: 12, height: 12 },
+    md: { width: 20, height: 20 },
+    lg: { width: 32, height: 32 },
   };
 
   const { width, height } = sizeMap[size];
@@ -103,10 +103,10 @@ export const TokenAvatar: React.FC<{
     // For sm and larger, use the original size
     const responsiveClass =
       size === "sm"
-        ? "w-7 h-7 sm:w-6 sm:h-6" // 30px on mobile, 24px on sm+
+        ? "w-5 h-5 sm:w-5 sm:h-5" 
         : size === "md"
-        ? "w-7 h-7 sm:w-10 sm:h-10" // 30px on mobile, 40px on sm+
-        : "w-7 h-7 sm:w-16 sm:h-16"; // 30px on mobile, 64px on sm+
+        ? "w-7 h-7 sm:w-8 sm:h-8" 
+        : "w-7 h-7 sm:w-12 sm:h-12"; 
 
     return `${baseClass} ${responsiveClass}`;
   };
@@ -115,8 +115,6 @@ export const TokenAvatar: React.FC<{
     <OptimizedImage
       src={src}
       alt={`${symbol} token`}
-      width={width}
-      height={height}
       className={getResponsiveClassName()}
       fallback={`/images/${symbol.toLowerCase()}.png`}
     />
